@@ -466,3 +466,34 @@ loadTurfJs().then(() => {
 }).catch((error) => {
     console.error('Failed to load Turf.js:', error);
 });
+// Assume polygonsLayer is your GeoJSON layer containing polygons
+polygonsLayer.eachLayer(function (layer) {
+    // Adding click event listener to each polygon
+    layer.on('click', function (e) {
+        // Clear any previous selection
+        polygonsLayer.eachLayer(function (l) {
+            l.setStyle({
+                color: '#3388ff' // Reset the color of unselected polygons
+            });
+        });
+
+        // Highlight the clicked polygon
+        layer.setStyle({
+            color: 'yellow', // Border color for the selected polygon
+            weight: 3 // Optional: Make the border a bit thicker for emphasis
+        });
+
+        // Assuming `layer.feature.properties.Murabba_No` contains the Murabba number
+        let murabbaNo = layer.feature.properties.Murabba_No;
+
+        // Select corresponding entry in Murabba dropdown (if it exists)
+        let murabbaDropdown = document.getElementById('murabbaSelector');
+        if (murabbaDropdown) {
+            murabbaDropdown.value = murabbaNo; // Set the dropdown to the selected Murabba
+        }
+
+        // Optionally, you can add logic to trigger other actions here
+        console.log('Selected Murabba:', murabbaNo);
+    });
+});
+
