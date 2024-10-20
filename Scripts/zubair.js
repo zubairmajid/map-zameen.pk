@@ -1,1 +1,1 @@
-var data =["1 DNB"]
+var data =["96 DB"]
