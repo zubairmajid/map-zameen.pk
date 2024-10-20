@@ -1,1 +1,1 @@
-var data =["zubair"]
+var data =["1 DNB"]
