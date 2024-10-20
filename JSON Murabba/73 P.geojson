@@ -1,6 +1,6 @@
 {
 "type": "FeatureCollection",
-"name": "73 P",
+"name": "E:\\GIS Projects\\Yazman\\Web Map Yazman\\JSON Murabba\\73 P.geojson",
 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
 "features": [
 { "type": "Feature", "properties": { "Murabba_No": "202/7" }, "geometry": { "type": "Polygon", "coordinates": [ ] } },
@@ -63,5 +63,3 @@
 { "type": "Feature", "properties": { "Murabba_No": "165/14" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 70.475346228903121, 28.509538312215003 ], [ 70.478770286444984, 28.509574910742085 ], [ 70.478807107838051, 28.506853648816531 ], [ 70.475383138012788, 28.506817047609339 ], [ 70.475346228903121, 28.509538312215003 ] ] ] } },
 { "type": "Feature", "properties": { "Murabba_No": "185/2" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 70.478770286444984, 28.509574910742085 ], [ 70.482194343986819, 28.509611509269167 ], [ 70.482231077663315, 28.506890250023726 ], [ 70.478807107838051, 28.506853648816531 ], [ 70.478770286444984, 28.509574910742085 ] ] ] } },
 { "type": "Feature", "properties": { "Murabba_No": "202/8" }, "geometry": { "type": "Polygon", "coordinates": [ ] } }
-]
-}
