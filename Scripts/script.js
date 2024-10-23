@@ -253,6 +253,14 @@ loadTurfJs().then(() => {
             }
         }
     });
+     // Handle the polygon click event to highlight it
+     polygon.on('click', function (e) {
+        // Reset all polygon styles first if needed
+        polygon.setStyle(defaultStyle);
+  
+        // Highlight the clicked polygon
+        polygon.setStyle(highlightStyle);
+      });
 
     function transformGeoJsonWithTurf(geojsonData, topLeft, topRight, bottomRight, bottomLeft) {
         const matrixSize = 5;
