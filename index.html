@@ -45,14 +45,8 @@
                       <ul class="nav">
                           <li class="scroll-to-section"><a href="#top" class="active">Home</a></li>
                           <li class="scroll-to-section"><a href="about-us.html">About</a></li>
-                          <li class="has-sub">
-                              <a href="javascript:void(0)">Pages</a>
-                              <ul class="sub-menu">
-                                  <li><a href="about-us.html">About Us</a></li>
-                                  <li><a href="contact-us.html">Contact Us</a></li>
-                              </ul>
-                          </li>
-                          <li class="scroll-to-section"><a href="#testimonials">Testimonials</a></li>
+                          <li class="scroll-to-section"><a href="contact-us.html">contact us</a></li>
+                          <li class="scroll-to-section"><a href="maps.html">Maps</a></li>
                           <li><a href="contact-us.html">Contact Support</a></li> 
                       </ul>        
                       <a class='menu-trigger'>
@@ -185,9 +179,8 @@
       </div>
     </div>
   </section>
-
-  
-  <section class="calculator">
+ <!-- Form Section -->
+   <section class="calculator">
     <div class="container">
       <div class="row">
         <div class="col-lg-7">
@@ -200,37 +193,39 @@
             <h6>Your Freedom</h6>
             <h4>Get a Plan</h4>
           </div>
-          <form id="calculate" action="" method="get">
+          
+          <!-- Form with PHP action to send email -->
+          <form id="calculate" action="send_email.php" method="post">
             <div class="row">
               <div class="col-lg-6">
                 <fieldset>
                   <label for="name">Your Name</label>
-                  <input type="name" name="name" id="name" placeholder="" autocomplete="on" required>
+                  <input type="name" name="name" id="name" placeholder="" required>
                 </fieldset>
               </div>
               <div class="col-lg-6">
                 <fieldset>
                   <label for="email">Your Email</label>
-                  <input type="text" name="email" id="email" pattern="[^ @]*@[^ @]*" placeholder="" required="">
+                  <input type="email" name="email" id="email" required>
                 </fieldset>
               </div>
               <div class="col-lg-12">
                 <fieldset>
                   <label for="subject">Subject</label>
-                  <input type="subject" name="subject" id="subject" placeholder="" autocomplete="on" >
+                  <input type="text" name="subject" id="subject" placeholder="" required>
                 </fieldset>
               </div>
               <div class="col-lg-12">
                 <fieldset>
                   <label for="chooseOption" class="form-label">Service you want</label>
-                  <select name="Category" class="form-select" aria-label="Default select example" id="chooseOption" onchange="this.form.click()">
-                      <option selected>Choose an Option</option>
-                      <option type="checkbox" name="option1" value="Mouza Map">Mouza Map</option>
-                      <option value="Personal Record">Personal Record</option>
-                      <option value="For Area Visit">For Area Visit</option>
-                      <option value="Specific Mustateel">Specific Mustateel</option>
+                  <select name="service" class="form-select" required>
+                    <option selected disabled>Choose an Option</option>
+                    <option value="Mouza Map">Mouza Map</option>
+                    <option value="Personal Record">Personal Record</option>
+                    <option value="For Area Visit">For Area Visit</option>
+                    <option value="Specific Mustateel">Specific Mustateel</option>
                   </select>
-              </fieldset>
+                </fieldset>
               </div>
               <div class="col-lg-12">
                 <fieldset>
