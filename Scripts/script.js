@@ -29,7 +29,7 @@ loadTurfJs().then(() => {
     });
 
     var baseLayers = {
-        "Satellite View": googleHybrid,
+        "Satellite View": googleSat,
         "Street View": googleStreet
     };
 
