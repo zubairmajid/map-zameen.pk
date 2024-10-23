@@ -1,6 +1,6 @@
 {
 "type": "FeatureCollection",
-"name": "E:\\naqsha-arazi.pk\\JSON Murabba\\Sadiq Abad\\31-NP.geojson",
+"name": "31-NP.geojson",
 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
 "features": [
 { "type": "Feature", "properties": { "Murabba_No": "43\/12" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 69.982648870933119, 28.301767342084325 ], [ 69.986066349614021, 28.301812771031557 ], [ 69.986118541581092, 28.299090875343555 ], [ 69.982701149615735, 28.299045445025456 ], [ 69.982648870933119, 28.301767342084325 ] ] ] } },
