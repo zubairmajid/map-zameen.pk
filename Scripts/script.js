@@ -29,7 +29,7 @@ loadTurfJs().then(() => {
     });
 
     var baseLayers = {
-        "Satellite View": googleSat,
+        "Satellite View": googleHybrid,
         "Street View": googleStreet
     };
 
@@ -254,7 +254,6 @@ loadTurfJs().then(() => {
         }
     });
     
-
     function transformGeoJsonWithTurf(geojsonData, topLeft, topRight, bottomRight, bottomLeft) {
         const matrixSize = 5;
 
