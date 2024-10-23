@@ -84,7 +84,7 @@ select:hover {
 }
 /* Hover effect for labels */
 .leaflet-control-layers label:hover {
-    background-color: #abb9f8;
+    background-color: orange;
     border-radius: 15px;
     color: rgb(247, 226, 223);
 }
@@ -98,10 +98,13 @@ select:hover {
 #map .leaflet-control-zoom-out {
     width: 28px;
     height: 28px;
-    background-color: #d4d4a6;
+    background-color: white;
     border: 2px solid #000;
     line-height: 36px;
-    border: 2x solid  yellow;
+    justify-content: center;
+    align-items: center;
+    
+    
 }
 /* Target the pseudo-elements specifically */
 
@@ -125,8 +128,8 @@ select:hover {
         padding: 0; /* Reset padding */
         margin: 0; /* Reset margin */
         box-sizing: border-box; /* This ensures padding and borders are included in the width and height */
-        background-color: #d4d4a6;
-        border: 2px solid #000;
+        background-color: white;
+        border: 2px solid yellow;
         line-height: 36px;
         border-radius: 50%;
         display: flex;
