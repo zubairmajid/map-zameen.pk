@@ -180,64 +180,84 @@
     </div>
   </section>
  <!-- Form Section -->
-   <section class="calculator">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-7">
-          <div class="left-image">
-            <img src="assets/images/calculator-image.png" alt="">
-          </div>
-        </div>
-        <div class="col-lg-5">
-          <div class="section-heading">
-            <h6>Your Freedom</h6>
-            <h4>Get a Plan</h4>
-          </div>
-          
-          <!-- Form with PHP action to send email -->
-          <form id="calculate" action="send_email.php" method="post">
-            <div class="row">
-              <div class="col-lg-6">
-                <fieldset>
-                  <label for="name">Your Name</label>
-                  <input type="name" name="name" id="name" placeholder="" required>
-                </fieldset>
-              </div>
-              <div class="col-lg-6">
-                <fieldset>
-                  <label for="email">Your Email</label>
-                  <input type="email" name="email" id="email" required>
-                </fieldset>
-              </div>
-              <div class="col-lg-12">
-                <fieldset>
-                  <label for="subject">Subject</label>
-                  <input type="text" name="subject" id="subject" placeholder="" required>
-                </fieldset>
-              </div>
-              <div class="col-lg-12">
-                <fieldset>
-                  <label for="chooseOption" class="form-label">Service you want</label>
-                  <select name="service" class="form-select" required>
-                    <option selected disabled>Choose an Option</option>
-                    <option value="Mouza Map">Mouza Map</option>
-                    <option value="Personal Record">Personal Record</option>
-                    <option value="For Area Visit">For Area Visit</option>
-                    <option value="Specific Mustateel">Specific Mustateel</option>
-                  </select>
-                </fieldset>
-              </div>
-              <div class="col-lg-12">
-                <fieldset>
-                  <button type="submit" id="form-submit" class="orange-button">Submit Now</button>
-                </fieldset>
-              </div>
-            </div>
-          </form>
+ <section class="calculator">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-7">
+        <div class="left-image">
+          <img src="assets/images/calculator-image.png" alt="">
         </div>
       </div>
+      <div class="col-lg-5">
+        <div class="section-heading">
+          <h6>Your Freedom</h6>
+          <h4>Get a Plan</h4>
+        </div>
+
+        <!-- Form using EmailJS -->
+        <form id="calculate">
+          <div class="row">
+            <div class="col-lg-6">
+              <fieldset>
+                <label for="name">Your Name</label>
+                <input type="text" name="name" id="name" placeholder="" required>
+              </fieldset>
+            </div>
+            <div class="col-lg-6">
+              <fieldset>
+                <label for="email">Your Email</label>
+                <input type="email" name="email" id="email" required>
+              </fieldset>
+            </div>
+            <div class="col-lg-12">
+              <fieldset>
+                <label for="subject">Subject</label>
+                <input type="text" name="subject" id="subject" placeholder="" required>
+              </fieldset>
+            </div>
+            <div class="col-lg-12">
+              <fieldset>
+                <label for="chooseOption" class="form-label">Service you want</label>
+                <select name="service" class="form-select" required>
+                  <option selected disabled>Choose an Option</option>
+                  <option value="Mouza Map">Mouza Map</option>
+                  <option value="Personal Record">Personal Record</option>
+                  <option value="For Area Visit">For Area Visit</option>
+                  <option value="Specific Mustateel">Specific Mustateel</option>
+                </select>
+              </fieldset>
+            </div>
+            <div class="col-lg-12">
+              <fieldset>
+                <button type="submit" id="form-submit" class="orange-button">Submit Now</button>
+              </fieldset>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
-  </section>
+  </div>
+</section>
+
+<!-- Include EmailJS Script -->
+<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+<script type="text/javascript">
+  (function() {
+    emailjs.init("service_jktz15f");  // Replace with your EmailJS User ID
+  })();
+
+  document.getElementById('calculate').addEventListener('submit', function(event) {
+    event.preventDefault();  // Prevent the default form submission
+
+    emailjs.sendForm('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', this)
+      .then(function() {
+        alert('Email sent successfully!');
+      }, function(error) {
+        alert('Failed to send email. Try again later.');
+      });
+  });
+</script>
+
 
   
   
