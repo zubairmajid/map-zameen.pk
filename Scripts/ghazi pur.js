@@ -1,1 +1,1 @@
-var data =["Ghazir Pur"]
+var data =["Ghazi Pur"]
