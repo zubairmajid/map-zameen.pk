@@ -17,6 +17,7 @@
         </a>
         <button id="add-user-btn">Add User</button>
         <button id="assign-html-btn">Assign HTML</button>
+        <button id="update-html-btn">Update HTML</button> <!-- New Button -->
         <button id="delete-user-btn">Delete User</button>
         <button id="new-users-btn">New Users</button>
     </div>
@@ -47,6 +48,17 @@
             <input type="text" id="html-link" placeholder="HTML File Link" required>
             <button type="submit" class="submit">Assign HTML</button>
             <div class="error" id="assign-error-message"></div>
+        </form>
+    </div>
+
+    <!-- Update Assigned HTML Content -->
+    <div class="content" id="update-html-content" style="display: none;">
+        <h1>Update Assigned HTML for User</h1>
+        <form id="update-html-form">
+            <input type="text" id="update-uid" placeholder="User UID" required>
+            <input type="text" id="update-html-link" placeholder="New HTML File Link" required>
+            <button type="submit" class="submit">Update HTML</button>
+            <div class="error" id="update-error-message"></div>
         </form>
     </div>
 
@@ -116,6 +128,9 @@
         document.getElementById('assign-html-btn').addEventListener('click', () => {
             showContent('assign-html-content');
         });
+        document.getElementById('update-html-btn').addEventListener('click', () => {
+            showContent('update-html-content');
+        });
         document.getElementById('delete-user-btn').addEventListener('click', () => {
             showContent('delete-user-content');
         });
@@ -142,10 +157,10 @@
                 if (snapshot.exists()) {
                     snapshot.forEach((childSnapshot) => {
                         const userData = childSnapshot.val();
-                        const userEmail = userData.email || 'N/A'; // Use email field
+                        const userEmail = userData.email || 'N/A';
                         const dateCreated = userData.creationTime || 'N/A';
                         const uid = childSnapshot.key;
-                        const assignedFile = userData.assignedFile || 'Not Assigned'; // Add assigned file field
+                        const assignedFile = userData.assignedFile || 'Not Assigned';
 
                         const row = document.createElement('tr');
                         row.innerHTML = `<td>${serialNo++}</td><td>${userEmail}</td><td>${uid}</td><td>${dateCreated}</td><td>${assignedFile}</td>`;
@@ -195,29 +210,45 @@
                     document.getElementById('assign-error-message').innerText = error.message;
                 });
         });
-// Delete User
-document.getElementById('delete-user-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email = document.getElementById('delete-email').value;
-    const password = document.getElementById('delete-password').value;
 
-    signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            const userId = user.uid;
+        // Update Assigned HTML
+        document.getElementById('update-html-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const uid = document.getElementById('update-uid').value;
+            const newHtmlLink = document.getElementById('update-html-link').value;
 
-            // Delete user from the database
-            return deleteUser(user).then(() => {
-                return set(ref(db, 'users/' + userId), null); // Remove user data from database
-            });
-        })
-        .then(() => {
-            document.getElementById('delete-error-message').innerText = 'User deleted successfully!';
-        })
-        .catch((error) => {
-            document.getElementById('delete-error-message').innerText = error.message;
+            set(ref(db, 'users/' + uid + '/assignedFile'), newHtmlLink)
+                .then(() => {
+                    document.getElementById('update-error-message').innerText = 'HTML file updated successfully!';
+                })
+                .catch((error) => {
+                    document.getElementById('update-error-message').innerText = error.message;
+                });
         });
-});
+
+        // Delete User
+        document.getElementById('delete-user-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('delete-email').value;
+            const password = document.getElementById('delete-password').value;
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    const userId = user.uid;
+
+                    // Delete user from the database
+                    return deleteUser(user).then(() => {
+                        return set(ref(db, 'users/' + userId), null); // Remove user data from database
+                    });
+                })
+                .then(() => {
+                    document.getElementById('delete-error-message').innerText = 'User deleted successfully!';
+                })
+                .catch((error) => {
+                    document.getElementById('delete-error-message').innerText = error.message;
+                });
+        });
 
         // Logout
         document.getElementById('logout-btn').addEventListener('click', () => {
