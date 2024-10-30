@@ -66,15 +66,16 @@
             <button type="submit" class="submit">Delete User</button>
             <div class="error" id="delete-error-message"></div>
         </form>
+
+        <!-- New Option for Deleting from Database -->
+        <h2>Delete from Database</h2>
+        <form id="delete-user-by-uid-form">
+            <input type="text" id="delete-uid" placeholder="User UID" required>
+            <button type="submit" class="submit">Delete User by UID</button>
+            <div class="error" id="delete-uid-error-message"></div>
+        </form>
     </div>
-  <!-- New Option for Deleting from Database -->
-  <h2>Delete from Database</h2>
-  <form id="delete-user-by-uid-form">
-      <input type="text" id="delete-uid" placeholder="User UID" required>
-      <button type="submit" class="submit">Delete User</button>
-      <div class="error" id="delete-uid-error-message"></div>
-  </form>
-</div>
+
     <!-- Manage User Role Content -->
     <div class="content" id="manage-role-content" style="display: none;">
         <h1>Manage User Roles</h1>
@@ -175,7 +176,7 @@
         });
         document.getElementById('new-users-btn').addEventListener('click', () => {
             showContent('new-users-content');
-            fetchNewUsers();
+            loadNewUsers();
         });
         document.getElementById('assign-html-btn').addEventListener('click', () => {
             showContent('assign-html-content');
@@ -184,60 +185,29 @@
             showContent('update-html-content');
         });
 
-        function showContent(contentId) {
-            const contents = document.querySelectorAll('.content');
-            contents.forEach(content => content.style.display = 'none');
-            document.getElementById(contentId).style.display = 'block';
-            document.getElementById('welcome-message').style.display = 'none';
-        }
-
-        // Fetch New Users
-        function fetchNewUsers() {
-            const usersRef = ref(db, 'users/');
-            const tbody = document.getElementById('new-users-tbody');
-            tbody.innerHTML = '';
-            let serialNo = 1;
-
-            onValue(usersRef, (snapshot) => {
-                if (snapshot.exists()) {
-                    snapshot.forEach((childSnapshot) => {
-                        const userData = childSnapshot.val();
-                        const userEmail = userData.email || 'N/A';
-                        const dateCreated = userData.creationTime || 'N/A';
-                        const uid = childSnapshot.key;
-                        const assignedFile = userData.assignedFile || 'Not Assigned';
-                        const status = userData.disabled ? 'Disabled' : 'Enabled';
-
-                        const row = document.createElement('tr');
-                        row.innerHTML = `<td>${serialNo++}</td><td>${userEmail}</td><td>${uid}</td><td>${dateCreated}</td><td>${assignedFile}</td><td>${status}</td>`;
-                        tbody.appendChild(row);
-                    });
-                } else {
-                    console.log("No new users available");
-                }
-            }, (error) => {
-                console.error("Error fetching new users:", error);
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            signOut(auth).then(() => {
+                window.location.href = "https://test.mustafapro.com/login.html"; // Redirect to login page after logout
+            }).catch((error) => {
+                console.error('Error during logout:', error);
             });
-        }
+        });
 
-        // Sign Up User
+        // Add User
         document.getElementById('signup-form').addEventListener('submit', (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-
             createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     const user = userCredential.user;
                     set(ref(db, 'users/' + user.uid), {
-                        email: email,
-                        assignedFile: null,
-                        creationTime: new Date().toISOString(),
-                        disabled: false
+                        email: user.email,
+                        uid: user.uid,
+                        createdAt: new Date().toISOString(),
                     });
-                    document.getElementById('error-message').innerText = 'User added successfully!';
-                    document.getElementById('email').value = '';
-                    document.getElementById('password').value = '';
+                    alert('User added successfully!');
                 })
                 .catch((error) => {
                     document.getElementById('error-message').innerText = error.message;
@@ -249,192 +219,91 @@
             e.preventDefault();
             const email = document.getElementById('change-email').value;
             const newPassword = document.getElementById('new-password').value;
-
-            // Find the user by email
-            const usersRef = ref(db, 'users/');
-            onValue(usersRef, (snapshot) => {
-                let userFound = false;
-                snapshot.forEach((childSnapshot) => {
-                    const userData = childSnapshot.val();
-                    if (userData.email === email) {
-                        userFound = true;
-                        const userId = childSnapshot.key;
-
-                        // Update password in Firebase Auth
-                        const user = auth.currentUser; // This will only work if the admin is logged in as that user
-                        if (user) {
-                            updatePassword(user, newPassword)
-                                .then(() => {
-                                    document.getElementById('change-error-message').innerText = 'Password changed successfully!';
-                                    document.getElementById('change-email').value = '';
-                                    document.getElementById('new-password').value = '';
-                                })
-                                .catch((error) => {
-                                    document.getElementById('change-error-message').innerText = error.message;
-                                });
-                        } else {
-                            document.getElementById('change-error-message').innerText = 'Admin must be logged in as the user to change the password.';
-                        }
-                    }
+            signInWithEmailAndPassword(auth, email, document.getElementById('delete-password').value)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    return updatePassword(user, newPassword);
+                })
+                .then(() => {
+                    alert('Password changed successfully!');
+                })
+                .catch((error) => {
+                    document.getElementById('change-error-message').innerText = error.message;
                 });
+        });
 
-                if (!userFound) {
-                    document.getElementById('change-error-message').innerText = 'User not found.';
+        // Delete User
+        document.getElementById('delete-user-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('delete-email').value;
+            const password = document.getElementById('delete-password').value;
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    return deleteUser(user);
+                })
+                .then(() => {
+                    alert('User deleted successfully!');
+                })
+                .catch((error) => {
+                    document.getElementById('delete-error-message').innerText = error.message;
+                });
+        });
+
+        // Delete User by UID
+        document.getElementById('delete-user-by-uid-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const uid = document.getElementById('delete-uid').value;
+
+            const userRef = ref(db, 'users/' + uid);
+            onValue(userRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    // If user exists, delete it
+                    set(userRef, null)
+                        .then(() => {
+                            alert('User deleted from database successfully!');
+                        })
+                        .catch((error) => {
+                            document.getElementById('delete-uid-error-message').innerText = error.message;
+                        });
+                } else {
+                    document.getElementById('delete-uid-error-message').innerText = 'User not found!';
                 }
             });
         });
 
-        // Delete User
-document.getElementById('delete-user-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email = document.getElementById('delete-email').value;
-    const password = document.getElementById('delete-password').value;
+        // Load New Users
+        function loadNewUsers() {
+            const newUsersRef = ref(db, 'users');
+            onValue(newUsersRef, (snapshot) => {
+                const users = snapshot.val();
+                const tbody = document.getElementById('new-users-tbody');
+                tbody.innerHTML = '';
+                let serialNo = 1;
 
-    signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            const userId = user.uid;
-
-            return deleteUser(user).then(() => {
-                return set(ref(db, 'users/' + userId), null);
+                for (const uid in users) {
+                    const user = users[uid];
+                    const row = `<tr>
+                        <td>${serialNo++}</td>
+                        <td>${user.email}</td>
+                        <td>${user.uid}</td>
+                        <td>${new Date(user.createdAt).toLocaleString()}</td>
+                        <td>${user.htmlLink || 'Not Assigned'}</td>
+                        <td>${user.status || 'Active'}</td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                }
             });
-        })
-        .then(() => {
-            // Show success message
-            document.getElementById('delete-error-message').innerText = 'User deleted successfully!';
-            // Clear input fields
-            document.getElementById('delete-email').value = '';
-            document.getElementById('delete-password').value = '';
-        })
-        .catch((error) => {
-            document.getElementById('delete-error-message').innerText = error.message;
-        });
-});
-// Delete User by UID
-document.getElementById('delete-user-by-uid-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const uid = document.getElementById('delete-uid').value;
-
-    // Fetch user details to ensure the user exists
-    const userRef = ref(db, 'users/' + uid);
-    onValue(userRef, (snapshot) => {
-        if (snapshot.exists()) {
-            const userEmail = snapshot.val().email;
-            const userPassword = prompt("Please enter the password for " + userEmail); // Prompt for password
-
-            signInWithEmailAndPassword(auth, userEmail, userPassword)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-
-                    return deleteUser(user).then(() => {
-                        return set(ref(db, 'users/' + uid), null);
-                    });
-                })
-                .then(() => {
-                    document.getElementById('delete-uid-error-message').innerText = 'User deleted successfully!';
-                    document.getElementById('delete-uid').value = '';
-                })
-                .catch((error) => {
-                    document.getElementById('delete-uid-error-message').innerText = error.message;
-                });
-        } else {
-            document.getElementById('delete-uid-error-message').innerText = 'User not found.';
         }
-    });
-});
 
-
-        // Manage User Roles
-        document.getElementById('assign-admin-btn').addEventListener('click', () => {
-            const uid = document.getElementById('role-uid').value;
-            set(ref(db, 'users/' + uid + '/role'), 'admin')
-                .then(() => {
-                    document.getElementById('role-success-message').innerText = 'Admin role assigned successfully!';
-                    document.getElementById('role-error-message').innerText = '';
-                })
-                .catch((error) => {
-                    document.getElementById('role-error-message').innerText = error.message;
-                });
-        });
-
-        document.getElementById('remove-admin-btn').addEventListener('click', () => {
-            const uid = document.getElementById('role-uid').value;
-            set(ref(db, 'users/' + uid + '/role'), null)
-                .then(() => {
-                    document.getElementById('role-success-message').innerText = 'Admin role removed successfully!';
-                    document.getElementById('role-error-message').innerText = '';
-                })
-                .catch((error) => {
-                    document.getElementById('role-error-message').innerText = error.message;
-                });
-        });
-
-        document.getElementById('enable-user-btn').addEventListener('click', () => {
-            const uid = document.getElementById('role-uid').value;
-            set(ref(db, 'users/' + uid + '/disabled'), false)
-                .then(() => {
-                    document.getElementById('role-success-message').innerText = 'User enabled successfully!';
-                    document.getElementById('role-error-message').innerText = '';
-                })
-                .catch((error) => {
-                    document.getElementById('role-error-message').innerText = error.message;
-                });
-        });
-
-        document.getElementById('disable-user-btn').addEventListener('click', () => {
-            const uid = document.getElementById('role-uid').value;
-            set(ref(db, 'users/' + uid + '/disabled'), true)
-                .then(() => {
-                    document.getElementById('role-success-message').innerText = 'User disabled successfully!';
-                    document.getElementById('role-error-message').innerText = '';
-                })
-                .catch((error) => {
-                    document.getElementById('role-error-message').innerText = error.message;
-                });
-        });
-
-        // Assign HTML to User
-        document.getElementById('assign-html-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const uid = document.getElementById('assign-uid').value;
-            const htmlLink = document.getElementById('html-link').value;
-
-            set(ref(db, 'users/' + uid + '/assignedFile'), htmlLink)
-                .then(() => {
-                    document.getElementById('assign-error-message').innerText = 'HTML file assigned successfully!';
-                    document.getElementById('assign-uid').value = '';
-                    document.getElementById('html-link').value = '';
-                })
-                .catch((error) => {
-                    document.getElementById('assign-error-message').innerText = error.message;
-                });
-        });
-
-        // Update Assigned HTML
-        document.getElementById('update-html-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const uid = document.getElementById('update-uid').value;
-            const newHtmlLink = document.getElementById('update-html-link').value;
-
-            set(ref(db, 'users/' + uid + '/assignedFile'), newHtmlLink)
-                .then(() => {
-                    document.getElementById('update-error-message').innerText = 'HTML file updated successfully!';
-                    document.getElementById('update-uid').value = '';
-                    document.getElementById('update-html-link').value = '';
-                })
-                .catch((error) => {
-                    document.getElementById('update-error-message').innerText = error.message;
-                });
-        });
-
-        // Logout
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            signOut(auth).then(() => {
-                window.location.href = "https://test.mustafapro.com/login.html";
-            }).catch((error) => {
-                console.error("Error during logout:", error);
+        function showContent(contentId) {
+            const contents = document.querySelectorAll('.content');
+            contents.forEach(content => {
+                content.style.display = 'none';
             });
-        });
+            document.getElementById(contentId).style.display = 'block';
+        }
     </script>
 </body>
 </html>
