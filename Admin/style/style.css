@@ -8,7 +8,7 @@
 
         .welcome-message {
             text-align: center; /* Center text */
-            margin: 40px ; /* More space above and below */
+            margin: 40px; /* More space above and below */
             padding: 20px; /* Add padding for better spacing */
             background-color: #f0f8ff; /* Light background color */
             border: 2px solid #4a90e2; /* Border with a nice color */
@@ -19,7 +19,22 @@
             max-width: 800px; /* Set a max width for the message box */
             margin-left: auto; /* Center horizontally */
             margin-right: auto; /* Center horizontally */
+            position: relative; /* Enable positioning for animation */
+            animation: moveMessage 10s linear infinite; /* Animation lasts 10 seconds, linear, repeats infinitely */
         }
+        
+        @keyframes moveMessage {
+            0% {
+                transform: translateX(-100%); /* Start off-screen to the left */
+            }
+            50% {
+                transform: translateX(0); /* Move to the center */
+            }
+            100% {
+                transform: translateX(100%); /* Move off-screen to the right */
+            }
+        }
+        
         
 .logout-container {
     position: absolute; /* or relative, depending on your layout */
