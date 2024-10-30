@@ -21,6 +21,7 @@
         <button id="add-user-btn"><i class="fas fa-user-plus"></i> Add User</button>
         <button id="change-password-btn"><i class="fas fa-key"></i> Change Password</button>
         <button id="delete-user-btn"><i class="fas fa-user-minus"></i> Delete User</button>
+        <button id="delete-user-by-uid-btn"><i class="fas fa-user-minus"></i> Delete User by UID</button>
         <button id="manage-role-btn"><i class="fas fa-user-shield"></i> Manage Roles</button>
         <button id="new-users-btn"><i class="fas fa-users"></i> New Users</button>
 
@@ -28,6 +29,7 @@
         <button id="assign-html-btn"><i class="fas fa-file-code"></i> Assign HTML</button>
         <button id="update-html-btn"><i class="fas fa-file-upload"></i> Update HTML</button>
     </div>
+    
     <div class="welcome-message" id="welcome-message">
         <h1>Welcome to Admin Dashboard</h1>
     </div>
@@ -65,6 +67,16 @@
             <input type="password" id="delete-password" placeholder="Password" required>
             <button type="submit" class="submit">Delete User</button>
             <div class="error" id="delete-error-message"></div>
+        </form>
+    </div>
+
+    <!-- Delete User by UID Content -->
+    <div class="content" id="delete-user-by-uid-content" style="display: none;">
+        <h1>Delete User by UID</h1>
+        <form id="delete-user-by-uid-form">
+            <input type="text" id="delete-uid" placeholder="User UID" required>
+            <button type="submit" class="submit">Delete User</button>
+            <div class="error" id="delete-uid-error-message"></div>
         </form>
     </div>
 
@@ -154,66 +166,32 @@
         });
 
         // Navigation Handlers
-        document.getElementById('add-user-btn').addEventListener('click', () => {
-            showContent('add-user-content');
-        });
-        document.getElementById('change-password-btn').addEventListener('click', () => {
-            showContent('change-password-content');
-        });
-        document.getElementById('delete-user-btn').addEventListener('click', () => {
-            showContent('delete-user-content');
-        });
-        document.getElementById('manage-role-btn').addEventListener('click', () => {
-            showContent('manage-role-content');
-        });
-        document.getElementById('new-users-btn').addEventListener('click', () => {
-            showContent('new-users-content');
-            fetchNewUsers();
-        });
-        document.getElementById('assign-html-btn').addEventListener('click', () => {
-            showContent('assign-html-content');
-        });
-        document.getElementById('update-html-btn').addEventListener('click', () => {
-            showContent('update-html-content');
-        });
+        document.getElementById('add-user-btn').addEventListener('click', () => showContent('add-user-content'));
+        document.getElementById('change-password-btn').addEventListener('click', () => showContent('change-password-content'));
+        document.getElementById('delete-user-btn').addEventListener('click', () => showContent('delete-user-content'));
+        document.getElementById('delete-user-by-uid-btn').addEventListener('click', () => showContent('delete-user-by-uid-content'));
+        document.getElementById('manage-role-btn').addEventListener('click', () => showContent('manage-role-content'));
+        document.getElementById('new-users-btn').addEventListener('click', () => showContent('new-users-content'));
+        document.getElementById('assign-html-btn').addEventListener('click', () => showContent('assign-html-content'));
+        document.getElementById('update-html-btn').addEventListener('click', () => showContent('update-html-content'));
 
+        // Show specific content
         function showContent(contentId) {
             const contents = document.querySelectorAll('.content');
             contents.forEach(content => content.style.display = 'none');
             document.getElementById(contentId).style.display = 'block';
-            document.getElementById('welcome-message').style.display = 'none';
         }
 
-        // Fetch New Users
-        function fetchNewUsers() {
-            const usersRef = ref(db, 'users/');
-            const tbody = document.getElementById('new-users-tbody');
-            tbody.innerHTML = '';
-            let serialNo = 1;
-
-            onValue(usersRef, (snapshot) => {
-                if (snapshot.exists()) {
-                    snapshot.forEach((childSnapshot) => {
-                        const userData = childSnapshot.val();
-                        const userEmail = userData.email || 'N/A';
-                        const dateCreated = userData.creationTime || 'N/A';
-                        const uid = childSnapshot.key;
-                        const assignedFile = userData.assignedFile || 'Not Assigned';
-                        const status = userData.disabled ? 'Disabled' : 'Enabled';
-
-                        const row = document.createElement('tr');
-                        row.innerHTML = `<td>${serialNo++}</td><td>${userEmail}</td><td>${uid}</td><td>${dateCreated}</td><td>${assignedFile}</td><td>${status}</td>`;
-                        tbody.appendChild(row);
-                    });
-                } else {
-                    console.log("No new users available");
-                }
-            }, (error) => {
-                console.error("Error fetching new users:", error);
+        // Logout Functionality
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            signOut(auth).then(() => {
+                window.location.href = "https://test.mustafapro.com/login.html"; // Redirect to login page
+            }).catch((error) => {
+                console.error(error);
             });
-        }
+        });
 
-        // Sign Up User
+        // Add User
         document.getElementById('signup-form').addEventListener('submit', (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
@@ -224,146 +202,133 @@
                     const user = userCredential.user;
                     set(ref(db, 'users/' + user.uid), {
                         email: email,
-                        assignedFile: null,
-                        creationTime: new Date().toISOString(),
-                        disabled: false
+                        dateOfCreation: new Date().toISOString(),
+                        htmlFileAssigned: "",
+                        status: "active"
                     });
                     document.getElementById('error-message').innerText = 'User added successfully!';
-                    document.getElementById('email').value = '';
-                    document.getElementById('password').value = '';
+                    document.getElementById('signup-form').reset();
                 })
                 .catch((error) => {
                     document.getElementById('error-message').innerText = error.message;
                 });
         });
 
-        // Change User Password
+        // Change Password
         document.getElementById('change-password-form').addEventListener('submit', (e) => {
             e.preventDefault();
             const email = document.getElementById('change-email').value;
             const newPassword = document.getElementById('new-password').value;
 
-            // Find the user by email
-            const usersRef = ref(db, 'users/');
-            onValue(usersRef, (snapshot) => {
+            // Fetch user by email and update password
+            const userRef = ref(db, 'users/');
+            onValue(userRef, (snapshot) => {
                 let userFound = false;
                 snapshot.forEach((childSnapshot) => {
                     const userData = childSnapshot.val();
                     if (userData.email === email) {
                         userFound = true;
-                        const userId = childSnapshot.key;
-
-                        // Update password in Firebase Auth
-                        const user = auth.currentUser; // This will only work if the admin is logged in as that user
-                        if (user) {
-                            updatePassword(user, newPassword)
-                                .then(() => {
-                                    document.getElementById('change-error-message').innerText = 'Password changed successfully!';
-                                    document.getElementById('change-email').value = '';
-                                    document.getElementById('new-password').value = '';
-                                })
-                                .catch((error) => {
-                                    document.getElementById('change-error-message').innerText = error.message;
-                                });
-                        } else {
-                            document.getElementById('change-error-message').innerText = 'Admin must be logged in as the user to change the password.';
-                        }
+                        const user = auth.currentUser; // Get current user
+                        updatePassword(user, newPassword)
+                            .then(() => {
+                                document.getElementById('change-error-message').innerText = 'Password changed successfully!';
+                                document.getElementById('change-password-form').reset();
+                            })
+                            .catch((error) => {
+                                document.getElementById('change-error-message').innerText = error.message;
+                            });
                     }
                 });
-
                 if (!userFound) {
                     document.getElementById('change-error-message').innerText = 'User not found.';
                 }
             });
         });
 
-        // Delete User
-document.getElementById('delete-user-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email = document.getElementById('delete-email').value;
-    const password = document.getElementById('delete-password').value;
+        // Delete User by Email
+        document.getElementById('delete-user-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('delete-email').value;
+            const password = document.getElementById('delete-password').value;
 
-    signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            const userId = user.uid;
-
-            return deleteUser(user).then(() => {
-                return set(ref(db, 'users/' + userId), null);
+            const userRef = ref(db, 'users/');
+            onValue(userRef, (snapshot) => {
+                let userFound = false;
+                snapshot.forEach((childSnapshot) => {
+                    const userData = childSnapshot.val();
+                    const uid = childSnapshot.key;
+                    if (userData.email === email) {
+                        userFound = true;
+                        signInWithEmailAndPassword(auth, email, password)
+                            .then((userCredential) => {
+                                const user = userCredential.user;
+                                return deleteUser(user).then(() => {
+                                    return set(ref(db, 'users/' + uid), null);
+                                });
+                            })
+                            .then(() => {
+                                document.getElementById('delete-error-message').innerText = 'User deleted successfully!';
+                                document.getElementById('delete-user-form').reset();
+                            })
+                            .catch((error) => {
+                                document.getElementById('delete-error-message').innerText = error.message;
+                            });
+                    }
+                });
+                if (!userFound) {
+                    document.getElementById('delete-error-message').innerText = 'User not found.';
+                }
             });
-        })
-        .then(() => {
-            // Show success message
-            document.getElementById('delete-error-message').innerText = 'User deleted successfully!';
-            // Clear input fields
-            document.getElementById('delete-email').value = '';
-            document.getElementById('delete-password').value = '';
-        })
-        .catch((error) => {
-            document.getElementById('delete-error-message').innerText = error.message;
         });
-});
+
+        // Delete User by UID
+        document.getElementById('delete-user-by-uid-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const uid = document.getElementById('delete-uid').value;
+
+            // Fetch user details to ensure the user exists
+            const userRef = ref(db, 'users/' + uid);
+            onValue(userRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const userEmail = snapshot.val().email;
+                    const userPassword = prompt("Please enter the password for " + userEmail); // Prompt for password
+
+                    signInWithEmailAndPassword(auth, userEmail, userPassword)
+                        .then((userCredential) => {
+                            const user = userCredential.user;
+
+                            return deleteUser(user).then(() => {
+                                return set(ref(db, 'users/' + uid), null);
+                            });
+                        })
+                        .then(() => {
+                            document.getElementById('delete-uid-error-message').innerText = 'User deleted successfully!';
+                            document.getElementById('delete-uid').value = '';
+                        })
+                        .catch((error) => {
+                            document.getElementById('delete-uid-error-message').innerText = error.message;
+                        });
+                } else {
+                    document.getElementById('delete-uid-error-message').innerText = 'User not found.';
+                }
+            });
+        });
 
         // Manage User Roles
-        document.getElementById('assign-admin-btn').addEventListener('click', () => {
-            const uid = document.getElementById('role-uid').value;
-            set(ref(db, 'users/' + uid + '/role'), 'admin')
-                .then(() => {
-                    document.getElementById('role-success-message').innerText = 'Admin role assigned successfully!';
-                    document.getElementById('role-error-message').innerText = '';
-                })
-                .catch((error) => {
-                    document.getElementById('role-error-message').innerText = error.message;
-                });
+        document.getElementById('admin-role-form').addEventListener('submit', (e) => {
+            e.preventDefault();
         });
 
-        document.getElementById('remove-admin-btn').addEventListener('click', () => {
-            const uid = document.getElementById('role-uid').value;
-            set(ref(db, 'users/' + uid + '/role'), null)
-                .then(() => {
-                    document.getElementById('role-success-message').innerText = 'Admin role removed successfully!';
-                    document.getElementById('role-error-message').innerText = '';
-                })
-                .catch((error) => {
-                    document.getElementById('role-error-message').innerText = error.message;
-                });
-        });
-
-        document.getElementById('enable-user-btn').addEventListener('click', () => {
-            const uid = document.getElementById('role-uid').value;
-            set(ref(db, 'users/' + uid + '/disabled'), false)
-                .then(() => {
-                    document.getElementById('role-success-message').innerText = 'User enabled successfully!';
-                    document.getElementById('role-error-message').innerText = '';
-                })
-                .catch((error) => {
-                    document.getElementById('role-error-message').innerText = error.message;
-                });
-        });
-
-        document.getElementById('disable-user-btn').addEventListener('click', () => {
-            const uid = document.getElementById('role-uid').value;
-            set(ref(db, 'users/' + uid + '/disabled'), true)
-                .then(() => {
-                    document.getElementById('role-success-message').innerText = 'User disabled successfully!';
-                    document.getElementById('role-error-message').innerText = '';
-                })
-                .catch((error) => {
-                    document.getElementById('role-error-message').innerText = error.message;
-                });
-        });
-
-        // Assign HTML to User
+        // Assign HTML
         document.getElementById('assign-html-form').addEventListener('submit', (e) => {
             e.preventDefault();
             const uid = document.getElementById('assign-uid').value;
             const htmlLink = document.getElementById('html-link').value;
 
-            set(ref(db, 'users/' + uid + '/assignedFile'), htmlLink)
+            set(ref(db, 'users/' + uid + '/htmlFileAssigned'), htmlLink)
                 .then(() => {
-                    document.getElementById('assign-error-message').innerText = 'HTML file assigned successfully!';
-                    document.getElementById('assign-uid').value = '';
-                    document.getElementById('html-link').value = '';
+                    document.getElementById('assign-error-message').innerText = 'HTML assigned successfully!';
+                    document.getElementById('assign-html-form').reset();
                 })
                 .catch((error) => {
                     document.getElementById('assign-error-message').innerText = error.message;
@@ -376,25 +341,42 @@ document.getElementById('delete-user-form').addEventListener('submit', (e) => {
             const uid = document.getElementById('update-uid').value;
             const newHtmlLink = document.getElementById('update-html-link').value;
 
-            set(ref(db, 'users/' + uid + '/assignedFile'), newHtmlLink)
+            set(ref(db, 'users/' + uid + '/htmlFileAssigned'), newHtmlLink)
                 .then(() => {
-                    document.getElementById('update-error-message').innerText = 'HTML file updated successfully!';
-                    document.getElementById('update-uid').value = '';
-                    document.getElementById('update-html-link').value = '';
+                    document.getElementById('update-error-message').innerText = 'HTML updated successfully!';
+                    document.getElementById('update-html-form').reset();
                 })
                 .catch((error) => {
                     document.getElementById('update-error-message').innerText = error.message;
                 });
         });
 
-        // Logout
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            signOut(auth).then(() => {
-                window.location.href = "https://test.mustafapro.com/login.html";
-            }).catch((error) => {
-                console.error("Error during logout:", error);
+        // Fetch New Users
+        const fetchNewUsers = () => {
+            const usersRef = ref(db, 'users/');
+            onValue(usersRef, (snapshot) => {
+                const tbody = document.getElementById('new-users-tbody');
+                tbody.innerHTML = ''; // Clear existing rows
+
+                let serialNo = 1;
+                snapshot.forEach((childSnapshot) => {
+                    const userData = childSnapshot.val();
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${serialNo++}</td>
+                        <td>${userData.email}</td>
+                        <td>${childSnapshot.key}</td>
+                        <td>${userData.dateOfCreation}</td>
+                        <td>${userData.htmlFileAssigned || "N/A"}</td>
+                        <td>${userData.status}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
             });
-        });
+        };
+
+        // Initial fetch of new users
+        fetchNewUsers();
     </script>
 </body>
 </html>
