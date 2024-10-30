@@ -190,6 +190,9 @@
                         creationTime: new Date().toISOString()
                     });
                     document.getElementById('error-message').innerText = 'User added successfully!';
+                    // Clear fields
+                    document.getElementById('email').value = '';
+                    document.getElementById('password').value = '';
                 })
                 .catch((error) => {
                     document.getElementById('error-message').innerText = error.message;
@@ -205,6 +208,9 @@
             set(ref(db, 'users/' + uid + '/assignedFile'), htmlLink)
                 .then(() => {
                     document.getElementById('assign-error-message').innerText = 'HTML file assigned successfully!';
+                    // Clear fields
+                    document.getElementById('assign-uid').value = '';
+                    document.getElementById('html-link').value = '';
                 })
                 .catch((error) => {
                     document.getElementById('assign-error-message').innerText = error.message;
@@ -220,6 +226,9 @@
             set(ref(db, 'users/' + uid + '/assignedFile'), newHtmlLink)
                 .then(() => {
                     document.getElementById('update-error-message').innerText = 'HTML file updated successfully!';
+                    // Clear fields
+                    document.getElementById('update-uid').value = '';
+                    document.getElementById('update-html-link').value = '';
                 })
                 .catch((error) => {
                     document.getElementById('update-error-message').innerText = error.message;
@@ -244,6 +253,9 @@
                 })
                 .then(() => {
                     document.getElementById('delete-error-message').innerText = 'User deleted successfully!';
+                    // Clear fields
+                    document.getElementById('delete-email').value = '';
+                    document.getElementById('delete-password').value = '';
                 })
                 .catch((error) => {
                     document.getElementById('delete-error-message').innerText = error.message;
