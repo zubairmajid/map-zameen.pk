@@ -126,7 +126,7 @@ const auth = getAuth(app);
 const database = getDatabase(app);
 
 
-  async function login() {
+async function login() {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
     const errorMessageElement = document.getElementById("error-message");
@@ -137,29 +137,35 @@ const database = getDatabase(app);
     loginButton.disabled = true;
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      const uid = user.uid;
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        const uid = user.uid;
 
-      const dbRef = ref(database);
-      const snapshot = await get(child(dbRef, `users/${uid}/assignedFile`));
+        const dbRef = ref(database);
+        const snapshot = await get(child(dbRef, `users/${uid}/assignedFile`));
 
-      if (snapshot.exists()) {
-        const assignedFileURL = snapshot.val();
-        sessionStorage.setItem("sessionToken", uid); // Set session token
-        window.location.href = assignedFileURL; // Redirect to assigned file
-      } else {
-        errorMessageElement.textContent = "No file assigned to this user.";
-        errorMessageElement.style.display = "block";
-      }
+        if (snapshot.exists()) {
+            const assignedFileURL = snapshot.val();
+            sessionStorage.setItem("sessionToken", uid); // Set session token
+
+            // Set token to expire after 30 minutes
+            setTimeout(() => {
+                sessionStorage.removeItem("sessionToken"); // Remove token after 30 minutes
+            }, 30 * 60 * 1000); // 30 minutes in milliseconds
+
+            window.location.href = assignedFileURL; // Redirect to assigned file
+        } else {
+            errorMessageElement.textContent = "No file assigned to this user.";
+            errorMessageElement.style.display = "block";
+        }
     } catch (error) {
-      errorMessageElement.textContent = "Login failed: " + error.message;
-      errorMessageElement.style.display = "block";
+        errorMessageElement.textContent = "Login failed: " + error.message;
+        errorMessageElement.style.display = "block";
     } finally {
-      loadingIndicator.style.display = "none";
-      loginButton.disabled = false;
+        loadingIndicator.style.display = "none";
+        loginButton.disabled = false;
     }
-  }
+}
 
   window.login = login;
 </script>

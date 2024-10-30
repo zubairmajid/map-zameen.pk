@@ -29,17 +29,18 @@ const auth = getAuth(app);
       
         // Check for session token on page load
         const sessionToken = sessionStorage.getItem("sessionToken");
-        if (!sessionToken) {
-          window.location.href = "https://test.mustafapro.com/login.html";
+if (!sessionToken) {
+    window.location.href = "https://test.mustafapro.com/login.html"; // Redirect to login if no token
+} else {
+    onAuthStateChanged(auth, (user) => {
+        if (user && user.uid === sessionToken) {
+            // User is authenticated, proceed with your page logic here
         } else {
-          onAuthStateChanged(auth, (user) => {
-            if (user && user.uid === sessionToken) {
-              // User is authenticated, proceed with the page
-            } else {
-              window.location.href = "https://test.mustafapro.com/login.html";
-            }
-          });
+            window.location.href = "https://test.mustafapro.com/login.html"; // Redirect if not authenticated
         }
+    });
+}
+
       
         // Clear session token on new tab open
         window.addEventListener("storage", (event) => {
