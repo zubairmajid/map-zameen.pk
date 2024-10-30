@@ -22,7 +22,7 @@
         <button id="change-password-btn"><i class="fas fa-key"></i> Change Password</button>
         <button id="delete-user-btn"><i class="fas fa-user-minus"></i> Delete User</button>
         <button id="manage-role-btn"><i class="fas fa-user-shield"></i> Manage Roles</button>
-        <button id="new-users-btn"><i class="fas fa-users"></i> New Users</button>
+        <button id="view-users-btn"><i class="fas fa-eye"></i> View Users</button> <!-- Updated Button Text -->
 
         <h3>HTML Section</h3>
         <button id="assign-html-btn"><i class="fas fa-file-code"></i> Assign HTML</button>
@@ -104,10 +104,9 @@
         </form>
     </div>
 
-    <!-- New Users Content -->
-    <div class="content" id="new-users-content" style="display: none;">
-        <h1>New Users</h1>
-        <table id="new-users-table">
+    <div class="content" id="view-users-content" style="display: none;">
+        <h1>All Users</h1>
+        <table id="view-users-table">
             <thead>
                 <tr>
                     <th>Serial No</th>
@@ -118,7 +117,7 @@
                     <th>Status</th>
                 </tr>
             </thead>
-            <tbody id="new-users-tbody">
+            <tbody id="view-users-tbody">
                 <!-- New users list will be populated here -->
             </tbody>
         </table>
