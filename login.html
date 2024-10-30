@@ -109,14 +109,14 @@
   import { getDatabase, ref, child, get } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyDpE3P5p8qmjqrCpWkCO_GByLLGN6T0d8Q",
-    authDomain: "digimap-6e7b3.firebaseapp.com",
-    databaseURL: "https://digimap-6e7b3-default-rtdb.firebaseio.com",
-    projectId: "digimap-6e7b3",
-    storageBucket: "digimap-6e7b3.appspot.com",
-    messagingSenderId: "822609711769",
-    appId: "1:822609711769:web:a7f3ecd060611d9e771e08",
-    measurementId: "G-9XC69NPN35"
+      apiKey: "AIzaSyDpE3P5p8qmjqrCpWkCO_GByLLGN6T0d8Q",
+      authDomain: "digimap-6e7b3.firebaseapp.com",
+      databaseURL: "https://digimap-6e7b3-default-rtdb.firebaseio.com",
+      projectId: "digimap-6e7b3",
+      storageBucket: "digimap-6e7b3.appspot.com",
+      messagingSenderId: "822609711769",
+      appId: "1:822609711769:web:a7f3ecd060611d9e771e08",
+      measurementId: "G-9XC69NPN35"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -124,63 +124,52 @@
   const database = getDatabase(app);
 
   async function login() {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const errorMessageElement = document.getElementById("error-message");
-    const loadingIndicator = document.getElementById("loading");
-    const loginButton = document.querySelector("button");
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const errorMessageElement = document.getElementById("error-message");
+      const loadingIndicator = document.getElementById("loading");
+      const loginButton = document.querySelector("button");
 
-    // Show loading indicator and disable the button
-    loadingIndicator.style.display = "block";
-    loginButton.disabled = true;
+      loadingIndicator.style.display = "block";
+      loginButton.disabled = true;
 
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      const uid = user.uid;
+      try {
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
+          const user = userCredential.user;
+          const uid = user.uid;
 
-      const dbRef = ref(database);
-      const snapshot = await get(child(dbRef, `users/${uid}/assignedFile`));
+          const dbRef = ref(database);
+          const snapshot = await get(child(dbRef, `users/${uid}/assignedFile`));
 
-      if (snapshot.exists()) {
-        const assignedFileURL = snapshot.val();
-        
-        // Set session token
-        sessionStorage.setItem("sessionToken", uid);
-
-        // Redirect to assigned file
-        window.location.href = assignedFileURL;
-      } else {
-        errorMessageElement.textContent = "No file assigned to this user.";
-        errorMessageElement.style.display = "block";
+          if (snapshot.exists()) {
+              const assignedFileURL = snapshot.val();
+              sessionStorage.setItem("sessionToken", uid);
+              window.location.href = assignedFileURL;  // Redirect to assigned file
+          } else {
+              errorMessageElement.textContent = "No file assigned to this user.";
+              errorMessageElement.style.display = "block";
+          }
+      } catch (error) {
+          errorMessageElement.textContent = "Login failed: " + error.message;
+          errorMessageElement.style.display = "block";
+      } finally {
+          loadingIndicator.style.display = "none";
+          loginButton.disabled = false;
       }
-    } catch (error) {
-      errorMessageElement.textContent = "Login failed: " + error.message;
-      errorMessageElement.style.display = "block";
-    } finally {
-      loadingIndicator.style.display = "none";
-      loginButton.disabled = false;
-    }
   }
 
-  // Check for session token on page load
+  // Optional: Check for session token on page load
   document.addEventListener("DOMContentLoaded", () => {
-    if (!sessionStorage.getItem("sessionToken")) {
-      // If no session token, redirect to login page
-      window.location.href = "login.html";
-    }
-  });
-
-  // Clear session token on reload or new tab
-  window.addEventListener("beforeunload", () => {
-    sessionStorage.removeItem("sessionToken");
+      if (sessionStorage.getItem("sessionToken")) {
+          window.location.href = "https://test.mustafapro.com/your-mapping-page.html"; // Redirect to your mapping page
+      }
   });
 
   // Trigger login on 'Enter' key press
   document.addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-      login();
-    }
+      if (event.key === "Enter") {
+          login();
+      }
   });
 
   window.login = login;

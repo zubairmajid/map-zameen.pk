@@ -9,7 +9,7 @@
     <script type="module">
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
         import { getDatabase, ref, child, get } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
         // Firebase configuration
@@ -30,9 +30,29 @@
         const database = getDatabase(app);
 
         // Check for session token on page load
-        if (!sessionStorage.getItem("sessionToken")) {
+        const sessionToken = sessionStorage.getItem("sessionToken");
+        if (!sessionToken) {
             // If no session token, redirect to login page
             window.location.href = "https://test.mustafapro.com/login.html";
+        } else {
+            // If session token exists, verify user and fetch assigned file
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    const uid = user.uid;
+                    const dbRef = ref(database);
+                    const snapshot = await get(child(dbRef, `users/${uid}/assignedFile`));
+
+                    if (snapshot.exists()) {
+                        const assignedFileURL = snapshot.val();
+                        // Optionally, redirect to assigned file if needed
+                        // window.location.href = assignedFileURL;
+                    } else {
+                        alert("No assigned file found for this user.");
+                    }
+                } else {
+                    window.location.href = "https://test.mustafapro.com/login.html";
+                }
+            });
         }
 
         // Clear session token on reload or new tab
