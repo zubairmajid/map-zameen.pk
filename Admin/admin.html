@@ -13,7 +13,7 @@
 <body>
 
     <div class="sidebar">
-        <a href="https://mustafapro.com/Admin/admin.html" style="text-decoration: none; color: inherit;">
+        <a href="https://test.mustafapro.com/Admin/admin.html" style="text-decoration: none; color: inherit;">
             <h2>Admin Panel</h2>
         </a>
         <button id="add-user-btn">Add User</button>
@@ -124,7 +124,7 @@
         // Check authentication status and redirect if not authenticated
         onAuthStateChanged(auth, (user) => {
     if (!user) {
-        window.location.href = "https://mustafapro.com/login.html"; // Redirect to login page if not authenticated
+        window.location.href = "https://test.mustafapro.com/login.html"; // Redirect to login page if not authenticated
     }
 });
 
@@ -253,7 +253,7 @@
         // Logout
         document.getElementById('logout-btn').addEventListener('click', () => {
             signOut(auth).then(() => {
-                window.location.href = "https://mustafapro.com/login.html"; // Redirect to login page on logout
+                window.location.href = "https://test.mustafapro.com/login.html"; // Redirect to login page on logout
             }).catch((error) => {
                 console.error("Error during logout:", error);
             });
