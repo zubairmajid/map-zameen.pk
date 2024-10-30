@@ -18,11 +18,9 @@
         <button id="add-user-btn">Add User</button>
         <button id="assign-html-btn">Assign HTML</button>
         <button id="delete-user-btn">Delete User</button>
-        <button id="view-users-btn">View Users</button>
         <button id="new-users-btn">New Users</button>
     </div>
 
-    <!-- Welcome Message -->
     <div class="welcome-message" id="welcome-message">
         <h1>Welcome to Admin Dashboard</h1>
     </div>
@@ -63,23 +61,6 @@
         </form>
     </div>
 
-    <!-- View Users Content -->
-    <div class="content" id="view-users-content" style="display: none;">
-        <h1>View Users</h1>
-        <table id="users-table">
-            <thead>
-                <tr>
-                    <th>List No</th>
-                    <th>User UID</th>
-                    <th>Assigned HTML File</th>
-                </tr>
-            </thead>
-            <tbody id="users-tbody">
-                <!-- User list will be populated here -->
-            </tbody>
-        </table>
-    </div>
-
     <!-- New Users Content -->
     <div class="content" id="new-users-content" style="display: none;">
         <h1>New Users</h1>
@@ -90,6 +71,7 @@
                     <th>Email</th>
                     <th>User UID</th>
                     <th>Date of Creation</th>
+                    <th>Assigned HTML File</th>
                 </tr>
             </thead>
             <tbody id="new-users-tbody">
@@ -137,10 +119,6 @@
         document.getElementById('delete-user-btn').addEventListener('click', () => {
             showContent('delete-user-content');
         });
-        document.getElementById('view-users-btn').addEventListener('click', () => {
-            showContent('view-users-content');
-            fetchUsers();
-        });
         document.getElementById('new-users-btn').addEventListener('click', () => {
             showContent('new-users-content');
             fetchNewUsers();
@@ -153,24 +131,6 @@
             document.getElementById('welcome-message').style.display = 'none'; // Hide welcome message when navigating
         }
 
-        // Fetch Users
-        function fetchUsers() {
-            const usersRef = ref(db, 'users/');
-            const tbody = document.getElementById('users-tbody');
-            tbody.innerHTML = '';
-            let listNo = 1;
-
-            onValue(usersRef, (snapshot) => {
-                snapshot.forEach((childSnapshot) => {
-                    const childKey = childSnapshot.key;
-                    const childData = childSnapshot.val();
-                    const row = document.createElement('tr');
-                    row.innerHTML = `<td>${listNo++}</td><td>${childKey}</td><td>${childData.assignedFile || 'Not Assigned'}</td>`;
-                    tbody.appendChild(row);
-                });
-            });
-        }
-
         // Fetch New Users
         function fetchNewUsers() {
             const usersRef = ref(db, 'users/');
@@ -179,16 +139,23 @@
             let serialNo = 1;
 
             onValue(usersRef, (snapshot) => {
-                snapshot.forEach((childSnapshot) => {
-                    const userData = childSnapshot.val();
-                    const userEmail = userData.email || 'N/A'; // Use email field
-                    const dateCreated = userData.creationTime || 'N/A';
-                    const uid = childSnapshot.key;
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        const userData = childSnapshot.val();
+                        const userEmail = userData.email || 'N/A'; // Use email field
+                        const dateCreated = userData.creationTime || 'N/A';
+                        const uid = childSnapshot.key;
+                        const assignedFile = userData.assignedFile || 'Not Assigned'; // Add assigned file field
 
-                    const row = document.createElement('tr');
-                    row.innerHTML = `<td>${serialNo++}</td><td>${userEmail}</td><td>${uid}</td><td>${dateCreated}</td>`;
-                    tbody.appendChild(row);
-                });
+                        const row = document.createElement('tr');
+                        row.innerHTML = `<td>${serialNo++}</td><td>${userEmail}</td><td>${uid}</td><td>${dateCreated}</td><td>${assignedFile}</td>`;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    console.log("No new users available");
+                }
+            }, (error) => {
+                console.error("Error fetching new users:", error);
             });
         }
 
