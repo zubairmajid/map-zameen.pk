@@ -15,13 +15,20 @@
         <a href="https://test.mustafapro.com/Admin/admin.html" style="text-decoration: none; color: inherit;">
             <h2>Admin Panel</h2>
         </a>
+        
+        <!-- Users Section -->
+        <h3>Users</h3>
         <button id="add-user-btn">Add User</button>
-        <button id="assign-html-btn">Assign HTML</button>
-        <button id="update-html-btn">Update HTML</button>
         <button id="change-password-btn">Change Password</button>
         <button id="delete-user-btn">Delete User</button>
+        <button id="manage-role-btn">Manage Roles</button>
         <button id="new-users-btn">New Users</button>
-        <button id="admin-role-btn">Manage Admin Role</button>
+
+        <!-- HTML Section -->
+        <h3>HTML Section</h3>
+        <button id="assign-html-btn">Assign HTML</button>
+        <button id="update-html-btn">Update HTML</button>
+
     </div>
 
     <div class="welcome-message" id="welcome-message">
@@ -39,28 +46,6 @@
             <input type="password" id="password" placeholder="Password" required>
             <button type="submit" class="submit">Sign Up</button>
             <div class="error" id="error-message"></div>
-        </form>
-    </div>
-
-    <!-- Assign HTML Content -->
-    <div class="content" id="assign-html-content" style="display: none;">
-        <h1>Assign HTML to User</h1>
-        <form id="assign-html-form">
-            <input type="text" id="assign-uid" placeholder="User UID" required>
-            <input type="text" id="html-link" placeholder="HTML File Link" required>
-            <button type="submit" class="submit">Assign HTML</button>
-            <div class="error" id="assign-error-message"></div>
-        </form>
-    </div>
-
-    <!-- Update Assigned HTML Content -->
-    <div class="content" id="update-html-content" style="display: none;">
-        <h1>Update Assigned HTML for User</h1>
-        <form id="update-html-form">
-            <input type="text" id="update-uid" placeholder="User UID" required>
-            <input type="text" id="update-html-link" placeholder="New HTML File Link" required>
-            <button type="submit" class="submit">Update HTML</button>
-            <div class="error" id="update-error-message"></div>
         </form>
     </div>
 
@@ -86,6 +71,42 @@
         </form>
     </div>
 
+    <!-- Manage User Role Content -->
+    <div class="content" id="manage-role-content" style="display: none;">
+        <h1>Manage User Roles</h1>
+        <form id="admin-role-form">
+            <input type="text" id="role-uid" placeholder="User UID" required>
+            <button type="button" id="assign-admin-btn">Assign Admin Role</button>
+            <button type="button" id="remove-admin-btn">Remove Admin Role</button>
+            <button type="button" id="enable-user-btn">Enable User</button>
+            <button type="button" id="disable-user-btn">Disable User</button>
+            <div class="success" id="role-success-message"></div>
+            <div class="error" id="role-error-message"></div>
+        </form>
+    </div>
+
+    <!-- Assign HTML Content -->
+    <div class="content" id="assign-html-content" style="display: none;">
+        <h1>Assign HTML to User</h1>
+        <form id="assign-html-form">
+            <input type="text" id="assign-uid" placeholder="User UID" required>
+            <input type="text" id="html-link" placeholder="HTML File Link" required>
+            <button type="submit" class="submit">Assign HTML</button>
+            <div class="error" id="assign-error-message"></div>
+        </form>
+    </div>
+
+    <!-- Update Assigned HTML Content -->
+    <div class="content" id="update-html-content" style="display: none;">
+        <h1>Update Assigned HTML for User</h1>
+        <form id="update-html-form">
+            <input type="text" id="update-uid" placeholder="User UID" required>
+            <input type="text" id="update-html-link" placeholder="New HTML File Link" required>
+            <button type="submit" class="submit">Update HTML</button>
+            <div class="error" id="update-error-message"></div>
+        </form>
+    </div>
+
     <!-- New Users Content -->
     <div class="content" id="new-users-content" style="display: none;">
         <h1>New Users</h1>
@@ -97,24 +118,13 @@
                     <th>User UID</th>
                     <th>Date of Creation</th>
                     <th>Assigned HTML File</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody id="new-users-tbody">
                 <!-- New users list will be populated here -->
             </tbody>
         </table>
-    </div>
-
-    <!-- Admin Role Management Content -->
-    <div class="content" id="admin-role-content" style="display: none;">
-        <h1>Manage Admin Role</h1>
-        <form id="admin-role-form">
-            <input type="text" id="role-uid" placeholder="User UID" required>
-            <button type="submit" id="assign-admin-btn">Assign Admin Role</button>
-            <button type="button" id="remove-admin-btn">Remove Admin Role</button>
-            <div class="error" id="role-error-message"></div>
-            <div class="success" id="role-success-message"></div>
-        </form>
     </div>
 
     <script type="module">
@@ -150,31 +160,31 @@
         document.getElementById('add-user-btn').addEventListener('click', () => {
             showContent('add-user-content');
         });
-        document.getElementById('assign-html-btn').addEventListener('click', () => {
-            showContent('assign-html-content');
-        });
-        document.getElementById('update-html-btn').addEventListener('click', () => {
-            showContent('update-html-content');
-        });
         document.getElementById('change-password-btn').addEventListener('click', () => {
             showContent('change-password-content');
         });
         document.getElementById('delete-user-btn').addEventListener('click', () => {
             showContent('delete-user-content');
         });
+        document.getElementById('manage-role-btn').addEventListener('click', () => {
+            showContent('manage-role-content');
+        });
         document.getElementById('new-users-btn').addEventListener('click', () => {
             showContent('new-users-content');
             fetchNewUsers();
         });
-        document.getElementById('admin-role-btn').addEventListener('click', () => {
-            showContent('admin-role-content');
+        document.getElementById('assign-html-btn').addEventListener('click', () => {
+            showContent('assign-html-content');
+        });
+        document.getElementById('update-html-btn').addEventListener('click', () => {
+            showContent('update-html-content');
         });
 
         function showContent(contentId) {
             const contents = document.querySelectorAll('.content');
             contents.forEach(content => content.style.display = 'none');
             document.getElementById(contentId).style.display = 'block';
-            document.getElementById('welcome-message').style.display = 'none'; // Hide welcome message when navigating
+            document.getElementById('welcome-message').style.display = 'none';
         }
 
         // Fetch New Users
@@ -192,9 +202,10 @@
                         const dateCreated = userData.creationTime || 'N/A';
                         const uid = childSnapshot.key;
                         const assignedFile = userData.assignedFile || 'Not Assigned';
+                        const status = userData.disabled ? 'Disabled' : 'Enabled';
 
                         const row = document.createElement('tr');
-                        row.innerHTML = `<td>${serialNo++}</td><td>${userEmail}</td><td>${uid}</td><td>${dateCreated}</td><td>${assignedFile}</td>`;
+                        row.innerHTML = `<td>${serialNo++}</td><td>${userEmail}</td><td>${uid}</td><td>${dateCreated}</td><td>${assignedFile}</td><td>${status}</td>`;
                         tbody.appendChild(row);
                     });
                 } else {
@@ -217,7 +228,8 @@
                     set(ref(db, 'users/' + user.uid), {
                         email: email,
                         assignedFile: null,
-                        creationTime: new Date().toISOString()
+                        creationTime: new Date().toISOString(),
+                        disabled: false
                     });
                     document.getElementById('error-message').innerText = 'User added successfully!';
                     document.getElementById('email').value = '';
@@ -225,40 +237,6 @@
                 })
                 .catch((error) => {
                     document.getElementById('error-message').innerText = error.message;
-                });
-        });
-
-        // Assign HTML to User
-        document.getElementById('assign-html-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const uid = document.getElementById('assign-uid').value;
-            const htmlLink = document.getElementById('html-link').value;
-
-            set(ref(db, 'users/' + uid + '/assignedFile'), htmlLink)
-                .then(() => {
-                    document.getElementById('assign-error-message').innerText = 'HTML file assigned successfully!';
-                    document.getElementById('assign-uid').value = '';
-                    document.getElementById('html-link').value = '';
-                })
-                .catch((error) => {
-                    document.getElementById('assign-error-message').innerText = error.message;
-                });
-        });
-
-        // Update Assigned HTML
-        document.getElementById('update-html-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const uid = document.getElementById('update-uid').value;
-            const newHtmlLink = document.getElementById('update-html-link').value;
-
-            set(ref(db, 'users/' + uid + '/assignedFile'), newHtmlLink)
-                .then(() => {
-                    document.getElementById('update-error-message').innerText = 'HTML file updated successfully!';
-                    document.getElementById('update-uid').value = '';
-                    document.getElementById('update-html-link').value = '';
-                })
-                .catch((error) => {
-                    document.getElementById('update-error-message').innerText = error.message;
                 });
         });
 
@@ -327,34 +305,87 @@
                 });
         });
 
-        // Manage Admin Role
-        document.getElementById('admin-role-form').addEventListener('submit', (e) => {
-            e.preventDefault();
+        // Manage User Roles
+        document.getElementById('assign-admin-btn').addEventListener('click', () => {
             const uid = document.getElementById('role-uid').value;
+            set(ref(db, 'users/' + uid + '/role'), 'admin')
+                .then(() => {
+                    document.getElementById('role-success-message').innerText = 'Admin role assigned successfully!';
+                    document.getElementById('role-error-message').innerText = '';
+                })
+                .catch((error) => {
+                    document.getElementById('role-error-message').innerText = error.message;
+                });
+        });
 
-            // Assign Admin Role
-            document.getElementById('assign-admin-btn').addEventListener('click', () => {
-                set(ref(db, 'users/' + uid + '/role'), 'admin')
-                    .then(() => {
-                        document.getElementById('role-success-message').innerText = 'Admin role assigned successfully!';
-                        document.getElementById('role-uid').value = '';
-                    })
-                    .catch((error) => {
-                        document.getElementById('role-error-message').innerText = error.message;
-                    });
-            });
+        document.getElementById('remove-admin-btn').addEventListener('click', () => {
+            const uid = document.getElementById('role-uid').value;
+            set(ref(db, 'users/' + uid + '/role'), null)
+                .then(() => {
+                    document.getElementById('role-success-message').innerText = 'Admin role removed successfully!';
+                    document.getElementById('role-error-message').innerText = '';
+                })
+                .catch((error) => {
+                    document.getElementById('role-error-message').innerText = error.message;
+                });
+        });
 
-            // Remove Admin Role
-            document.getElementById('remove-admin-btn').addEventListener('click', () => {
-                set(ref(db, 'users/' + uid + '/role'), null)
-                    .then(() => {
-                        document.getElementById('role-success-message').innerText = 'Admin role removed successfully!';
-                        document.getElementById('role-uid').value = '';
-                    })
-                    .catch((error) => {
-                        document.getElementById('role-error-message').innerText = error.message;
-                    });
-            });
+        document.getElementById('enable-user-btn').addEventListener('click', () => {
+            const uid = document.getElementById('role-uid').value;
+            set(ref(db, 'users/' + uid + '/disabled'), false)
+                .then(() => {
+                    document.getElementById('role-success-message').innerText = 'User enabled successfully!';
+                    document.getElementById('role-error-message').innerText = '';
+                })
+                .catch((error) => {
+                    document.getElementById('role-error-message').innerText = error.message;
+                });
+        });
+
+        document.getElementById('disable-user-btn').addEventListener('click', () => {
+            const uid = document.getElementById('role-uid').value;
+            set(ref(db, 'users/' + uid + '/disabled'), true)
+                .then(() => {
+                    document.getElementById('role-success-message').innerText = 'User disabled successfully!';
+                    document.getElementById('role-error-message').innerText = '';
+                })
+                .catch((error) => {
+                    document.getElementById('role-error-message').innerText = error.message;
+                });
+        });
+
+        // Assign HTML to User
+        document.getElementById('assign-html-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const uid = document.getElementById('assign-uid').value;
+            const htmlLink = document.getElementById('html-link').value;
+
+            set(ref(db, 'users/' + uid + '/assignedFile'), htmlLink)
+                .then(() => {
+                    document.getElementById('assign-error-message').innerText = 'HTML file assigned successfully!';
+                    document.getElementById('assign-uid').value = '';
+                    document.getElementById('html-link').value = '';
+                })
+                .catch((error) => {
+                    document.getElementById('assign-error-message').innerText = error.message;
+                });
+        });
+
+        // Update Assigned HTML
+        document.getElementById('update-html-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const uid = document.getElementById('update-uid').value;
+            const newHtmlLink = document.getElementById('update-html-link').value;
+
+            set(ref(db, 'users/' + uid + '/assignedFile'), newHtmlLink)
+                .then(() => {
+                    document.getElementById('update-error-message').innerText = 'HTML file updated successfully!';
+                    document.getElementById('update-uid').value = '';
+                    document.getElementById('update-html-link').value = '';
+                })
+                .catch((error) => {
+                    document.getElementById('update-error-message').innerText = error.message;
+                });
         });
 
         // Logout
