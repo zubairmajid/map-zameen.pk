@@ -5,26 +5,13 @@ body {
     height: 100vh;
 }
 
-.welcome-message {
-    text-align: center; /* Center text */
-    margin: 40px; /* More space above and below */
-    padding: 20px; /* Add padding for better spacing */
-    background-color: #f0f8ff; /* Light background color */
-    border: 2px solid #4a90e2; /* Border with a nice color */
-    border-radius: 10px; /* Rounded corners */
-    font-size: 24px; /* Increase font size */
-    color: #333; /* Text color */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Add a shadow for depth */
-    max-width: 800px; /* Set a max width for the message box */
-    margin-left: auto; /* Center horizontally */
-    margin-right: auto; /* Center horizontally */
-}
+
 
 .admin-panel-title {
     font-size: 10px; /* Larger for better visibility */
     font-weight: bold; /* Make text bold */
     color: #ffffff; /* White text color */
-    background-color: #4a90e2; /* Admin panel background color */
+    background-color: green; /* Admin panel background color */
     padding: 10px; /* Increased padding for a bolder appearance */
     border-radius: 10px; /* Slightly more rounded */
     text-align: center; /* Center text */
@@ -38,6 +25,7 @@ body {
     background-color: #357ABD; /* Darken background on hover */
     transform: translateY(-2px); /* Slight lift effect on hover */
 }
+
 
 .logout-container {
     position: absolute; /* or relative, depending on your layout */
@@ -59,19 +47,47 @@ body {
 }
 
 .sidebar {
-    width: 220px; /* Slightly wider for better spacing */
-    background-color: #2c3e50;
-    color: white;
-    padding: 20px;
-    position: relative;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2); /* Added shadow for depth */
-    transition: width 0.3s; /* Smooth transition on hover */
+    width: 250px; /* Slightly wider for better spacing */
+    background-color: #2c3e50; /* Dark background */
+    color: white; /* White text for contrast */
+    padding: 20px; /* Padding for inner spacing */
+    position: relative; /* Relative positioning */
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.3); /* Deeper shadow for more depth */
+    transition: width 0.3s, background-color 0.3s; /* Smooth transition for width and background color */
+    border-radius: 8px; /* Rounded corners */
+}
+
+.sidebar:hover {
+    background-color: #34495e; /* Slightly lighter background on hover */
 }
 
 .sidebar h2 {
-    font-size: 26px; /* Slightly larger for prominence */
-    margin-bottom: 30px; /* More space below */
+    font-size: 28px; /* Slightly larger for prominence */
+    margin-bottom: 20px; /* More space below */
+    font-weight: 600; /* Bold for emphasis */
 }
+
+.sidebar ul {
+    list-style-type: none; /* Remove default list styling */
+    padding: 0; /* Remove default padding */
+}
+
+.sidebar ul li {
+    margin: 15px 0; /* Space between items */
+}
+
+.sidebar ul li a {
+    color: white; /* Link color */
+    text-decoration: none; /* Remove underline */
+    font-size: 18px; /* Font size for links */
+    transition: color 0.3s; /* Smooth transition for link color */
+}
+
+.sidebar ul li a:hover {
+    color: #ecf0f1; /* Lighten link color on hover */
+    padding-left: 5px; /* Subtle movement on hover */
+}
+
 
 .sidebar button {
     background: none;
@@ -97,71 +113,196 @@ body {
     background-color: #ecf0f1;
 }
 
-#signup-form, #assign-html-form, #view-users-content {
+/* Base form styling */
+form {
     background-color: #fff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    width: 300px;
+    width: 100%; /* Full width */
+    max-width: 400px; /* Limit max width for larger screens */
+    margin: 20px auto; /* Center the form */
 }
 
+/* Flex container for form elements */
+.form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* Full width items */
+}
+
+/* Input and select styles */
 input[type="email"],
 input[type="password"],
 input[type="text"],
 select {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
+    width: 100%; /* Full width */
+    padding: 15px;
+    margin: 12px 0;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 5px;
     box-sizing: border-box;
-    transition: border 0.3s;
+    transition: border 0.3s, box-shadow 0.3s;
+    background-color: #f9f9f9;
+    font-size: 16px;
+}
+
+input[type="email"]:hover,
+input[type="password"]:hover,
+input[type="text"]:hover,
+select:hover {
+    border-color: #007BFF;
 }
 
 input[type="email"]:focus,
 input[type="password"]:focus,
 input[type="text"]:focus,
 select:focus {
-    border: 1px solid #007BFF;
+    border-color: #007BFF;
     outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
-button.submit {
-    background-color: #007BFF;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
-    transition: background-color 0.3s;
+/* Button styles */
+button {
+    background-color: #007BFF; /* Primary blue color */
+    color: white;              /* White text */
+    padding: 12px;            /* Padding for button */
+    border: none;             /* No border */
+    border-radius: 5px;      /* Rounded corners */
+    cursor: pointer;          /* Pointer on hover */
+    width: 100%;              /* Full width */
+    transition: background-color 0.3s; /* Smooth background transition */
+    font-size: 16px;          /* Font size */
+    margin-top: 10px;        /* Space above button */
 }
 
-button.submit:hover {
-    background-color: #0056b3;
+/* Hover effect */
+button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
 }
 
+/* Specific styles for different buttons */
+#assign-admin-btn {
+    background-color: #28a745; /* Green for assign */
+}
+
+#assign-admin-btn:hover {
+    background-color: #218838; /* Darker green on hover */
+}
+
+#remove-admin-btn {
+    background-color: #dc3545; /* Red for remove */
+}
+
+#remove-admin-btn:hover {
+    background-color: #c82333; /* Darker red on hover */
+}
+
+#enable-user-btn {
+    background-color: #17a2b8; /* Teal for enable */
+}
+
+#enable-user-btn:hover {
+    background-color: #138496; /* Darker teal on hover */
+}
+
+#disable-user-btn {
+    background-color: #ffc107; /* Yellow for disable */
+}
+
+#disable-user-btn:hover {
+    background-color: #e0a800; /* Darker yellow on hover */
+}
+
+/* Error message style */
 .error {
-    color: red;
-    font-size: 14px;
+    color: red;                /* Red for error messages */
+    font-size: 14px;          /* Font size */
+    margin-top: -10px;        /* Position error message closer to input */
 }
 
-#users-table {
+/* Optional media query for responsiveness */
+@media (max-width: 600px) {
+    form {
+        padding: 15px; /* Adjust padding for smaller screens */
+    }
+}
+/* General Styles for Tables */
+table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    font-family: Arial, sans-serif; /* Use a modern font */
 }
 
-#users-table th, #users-table td {
-    border: 1px solid #ccc;
-    padding: 10px;
+th, td {
+    padding: 12px; /* Increased padding for better spacing */
     text-align: left;
+    border: 1px solid black; /* Changed to black */
 }
 
-#users-table th {
-    background-color: #f2f2f2;
+th {
+    background-color: #4CAF50; /* More vibrant header color */
+    color: white; /* White text for contrast */
+    font-weight: bold; /* Emphasize header text */
+    text-transform: uppercase; /* Optional: uppercase letters for headers */
 }
 
+tbody tr {
+    transition: background-color 0.3s; /* Smooth transition for hover effects */
+}
+
+tbody tr:hover {
+    background-color: #f1f1f1; /* Light hover effect */
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9; /* Alternate row color */
+}
+
+tbody td {
+    border-bottom: 1px solid black; /* Changed to black */
+}
+
+/* New Users Table Styles */
+#new-users-table {
+    margin-top: 20px;
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif; /* Use a modern font */
+}
+
+#new-users-table th {
+    background-color: #4CAF50; /* Use a more vibrant color */
+    color: white;
+    padding: 12px; /* Add padding for better spacing */
+    text-align: left; /* Align text to the left */
+    border-bottom: 2px solid black; /* Changed to black */
+}
+
+#new-users-table tbody tr {
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+#new-users-table tbody tr:hover {
+    background-color: #f1f1f1; /* Slightly lighter hover color */
+}
+
+#new-users-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9; /* Keep alternate row color */
+}
+
+#new-users-table td {
+    padding: 10px; /* Add padding for better spacing */
+    border-bottom: 1px solid black; /* Changed to black */
+}
+
+#new-users-table td:first-child {
+    font-weight: bold; /* Highlight the first column */
+}
+
+/* Modal Styles */
 #uid-modal {
     position: fixed;
     top: 0;
@@ -183,40 +324,4 @@ button.submit:hover {
 
 .modal-content button {
     margin: 10px;
-}
-
-/* General Styles for Tables */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-th, td {
-    padding: 10px;
-    text-align: left;
-    border: 1px solid #ddd;
-}
-
-th {
-    background-color: #f2f2f2;
-    color: #333;
-}
-
-/* New Users Table Styles */
-#new-users-table {
-    margin-top: 20px;
-}
-
-#new-users-table th {
-    background-color: #f2f2f2;
-    color: #333;
-}
-
-#new-users-table tbody tr:hover {
-    background-color: #e0e0e0;
-}
-
-#new-users-table tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
 }
