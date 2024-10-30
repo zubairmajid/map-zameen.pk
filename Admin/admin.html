@@ -195,25 +195,29 @@
                     document.getElementById('assign-error-message').innerText = error.message;
                 });
         });
+// Delete User
+document.getElementById('delete-user-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('delete-email').value;
+    const password = document.getElementById('delete-password').value;
 
-        // Delete User
-        document.getElementById('delete-user-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('delete-email').value;
-            const password = document.getElementById('delete-password').value;
+    signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            const userId = user.uid;
 
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    return deleteUser(user);
-                })
-                .then(() => {
-                    document.getElementById('delete-error-message').innerText = 'User deleted successfully!';
-                })
-                .catch((error) => {
-                    document.getElementById('delete-error-message').innerText = error.message;
-                });
+            // Delete user from the database
+            return deleteUser(user).then(() => {
+                return set(ref(db, 'users/' + userId), null); // Remove user data from database
+            });
+        })
+        .then(() => {
+            document.getElementById('delete-error-message').innerText = 'User deleted successfully!';
+        })
+        .catch((error) => {
+            document.getElementById('delete-error-message').innerText = error.message;
         });
+});
 
         // Logout
         document.getElementById('logout-btn').addEventListener('click', () => {
