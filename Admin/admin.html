@@ -61,8 +61,7 @@
     <div class="content" id="delete-user-content" style="display: none;">
         <h1>Delete User</h1>
         <form id="delete-user-form">
-            <input type="text" id="delete-uid" placeholder="User UID" required>
-        <input type="email" id="delete-email" placeholder="User Email" required>
+            <input type="email" id="delete-email" placeholder="User Email" required>
             <input type="password" id="delete-password" placeholder="Password" required>
             <button type="submit" class="submit">Delete User</button>
             <div class="error" id="delete-error-message"></div>
@@ -278,31 +277,25 @@
             });
         });
 
-       // Delete User by UID and Email
+        // Delete User
 document.getElementById('delete-user-form').addEventListener('submit', (e) => {
     e.preventDefault();
-    const uid = document.getElementById('delete-uid').value;
     const email = document.getElementById('delete-email').value;
     const password = document.getElementById('delete-password').value;
 
-    // Authenticate user with email and password before deletion
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            // After successful sign-in, delete the user
             const user = userCredential.user;
+            const userId = user.uid;
 
-            // Delete user from Firebase Auth
             return deleteUser(user).then(() => {
-                // Delete user data from Realtime Database
-                const userRef = ref(db, 'users/' + uid);
-                return set(userRef, null);
+                return set(ref(db, 'users/' + userId), null);
             });
         })
         .then(() => {
             // Show success message
-            document.getElementById('delete-error-message').innerText = 'User and their data deleted successfully!';
+            document.getElementById('delete-error-message').innerText = 'User deleted successfully!';
             // Clear input fields
-            document.getElementById('delete-uid').value = '';
             document.getElementById('delete-email').value = '';
             document.getElementById('delete-password').value = '';
         })
@@ -310,7 +303,6 @@ document.getElementById('delete-user-form').addEventListener('submit', (e) => {
             document.getElementById('delete-error-message').innerText = error.message;
         });
 });
-
 
         // Manage User Roles
         document.getElementById('assign-admin-btn').addEventListener('click', () => {
