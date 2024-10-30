@@ -1,0 +1,1 @@
+var data =["73-P","Bahishti","Hameed Abad"]

@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "Home",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Murabba_No": "534/16" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 70.312626066211408, 28.404227351543785 ], [ 70.316050650052802, 28.40426393399018 ], [ 70.316087208296111, 28.401542680104971 ], [ 70.312662712171303, 28.401506094978462 ], [ 70.312626066211408, 28.404227351543785 ] ] ] } }
+]
+}
