@@ -277,34 +277,35 @@
             });
         });
 
-        // Delete User
+       // Delete User by UID
 document.getElementById('delete-user-form').addEventListener('submit', (e) => {
     e.preventDefault();
-    const email = document.getElementById('delete-email').value;
-    const password = document.getElementById('delete-password').value;
+    const uid = document.getElementById('delete-email').value; // Assuming you use the email field for UID input
 
-    // Authenticate the admin user to delete
-    signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            const userId = user.uid;
+    // Get the user reference in the database
+    const userRef = ref(db, 'users/' + uid);
 
+    // Delete the user from Firebase Auth and their data from the database
+    userRef.get().then((snapshot) => {
+        if (snapshot.exists()) {
             // Delete user from Firebase Auth
+            const user = auth.currentUser; // Assuming the admin is logged in
+
             return deleteUser(user).then(() => {
                 // Delete user data from Realtime Database
-                return set(ref(db, 'users/' + userId), null);
+                return set(userRef, null);
             });
-        })
-        .then(() => {
-            // Show success message
-            document.getElementById('delete-error-message').innerText = 'User and their data deleted successfully!';
-            // Clear input fields
-            document.getElementById('delete-email').value = '';
-            document.getElementById('delete-password').value = '';
-        })
-        .catch((error) => {
-            document.getElementById('delete-error-message').innerText = error.message;
-        });
+        } else {
+            document.getElementById('delete-error-message').innerText = 'User not found.';
+        }
+    }).then(() => {
+        // Show success message
+        document.getElementById('delete-error-message').innerText = 'User and their data deleted successfully!';
+        // Clear input fields
+        document.getElementById('delete-email').value = ''; // Adjust if necessary
+    }).catch((error) => {
+        document.getElementById('delete-error-message').innerText = error.message;
+    });
 });
 
 
