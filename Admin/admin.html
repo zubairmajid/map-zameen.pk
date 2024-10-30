@@ -17,9 +17,11 @@
         </a>
         <button id="add-user-btn">Add User</button>
         <button id="assign-html-btn">Assign HTML</button>
-        <button id="update-html-btn">Update HTML</button> <!-- New Button -->
+        <button id="update-html-btn">Update HTML</button>
+        <button id="change-password-btn">Change Password</button>
         <button id="delete-user-btn">Delete User</button>
         <button id="new-users-btn">New Users</button>
+        <button id="admin-role-btn">Manage Admin Role</button>
     </div>
 
     <div class="welcome-message" id="welcome-message">
@@ -62,6 +64,17 @@
         </form>
     </div>
 
+    <!-- Change Password Content -->
+    <div class="content" id="change-password-content" style="display: none;">
+        <h1>Change User Password</h1>
+        <form id="change-password-form">
+            <input type="email" id="change-email" placeholder="User Email" required>
+            <input type="password" id="new-password" placeholder="New Password" required>
+            <button type="submit" class="submit">Change Password</button>
+            <div class="error" id="change-error-message"></div>
+        </form>
+    </div>
+
     <!-- Delete User Content -->
     <div class="content" id="delete-user-content" style="display: none;">
         <h1>Delete User</h1>
@@ -92,9 +105,21 @@
         </table>
     </div>
 
+    <!-- Admin Role Management Content -->
+    <div class="content" id="admin-role-content" style="display: none;">
+        <h1>Manage Admin Role</h1>
+        <form id="admin-role-form">
+            <input type="text" id="role-uid" placeholder="User UID" required>
+            <button type="submit" id="assign-admin-btn">Assign Admin Role</button>
+            <button type="button" id="remove-admin-btn">Remove Admin Role</button>
+            <div class="error" id="role-error-message"></div>
+            <div class="success" id="role-success-message"></div>
+        </form>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, deleteUser, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, deleteUser, signInWithEmailAndPassword, updatePassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
@@ -131,12 +156,18 @@
         document.getElementById('update-html-btn').addEventListener('click', () => {
             showContent('update-html-content');
         });
+        document.getElementById('change-password-btn').addEventListener('click', () => {
+            showContent('change-password-content');
+        });
         document.getElementById('delete-user-btn').addEventListener('click', () => {
             showContent('delete-user-content');
         });
         document.getElementById('new-users-btn').addEventListener('click', () => {
             showContent('new-users-content');
             fetchNewUsers();
+        });
+        document.getElementById('admin-role-btn').addEventListener('click', () => {
+            showContent('admin-role-content');
         });
 
         function showContent(contentId) {
@@ -183,14 +214,12 @@
             createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     const user = userCredential.user;
-                    // Save user data in the database
                     set(ref(db, 'users/' + user.uid), {
                         email: email,
                         assignedFile: null,
                         creationTime: new Date().toISOString()
                     });
                     document.getElementById('error-message').innerText = 'User added successfully!';
-                    // Clear fields
                     document.getElementById('email').value = '';
                     document.getElementById('password').value = '';
                 })
@@ -208,7 +237,6 @@
             set(ref(db, 'users/' + uid + '/assignedFile'), htmlLink)
                 .then(() => {
                     document.getElementById('assign-error-message').innerText = 'HTML file assigned successfully!';
-                    // Clear fields
                     document.getElementById('assign-uid').value = '';
                     document.getElementById('html-link').value = '';
                 })
@@ -226,13 +254,52 @@
             set(ref(db, 'users/' + uid + '/assignedFile'), newHtmlLink)
                 .then(() => {
                     document.getElementById('update-error-message').innerText = 'HTML file updated successfully!';
-                    // Clear fields
                     document.getElementById('update-uid').value = '';
                     document.getElementById('update-html-link').value = '';
                 })
                 .catch((error) => {
                     document.getElementById('update-error-message').innerText = error.message;
                 });
+        });
+
+        // Change User Password
+        document.getElementById('change-password-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('change-email').value;
+            const newPassword = document.getElementById('new-password').value;
+
+            // Find the user by email
+            const usersRef = ref(db, 'users/');
+            onValue(usersRef, (snapshot) => {
+                let userFound = false;
+                snapshot.forEach((childSnapshot) => {
+                    const userData = childSnapshot.val();
+                    if (userData.email === email) {
+                        userFound = true;
+                        const userId = childSnapshot.key;
+
+                        // Update password in Firebase Auth
+                        const user = auth.currentUser; // This will only work if the admin is logged in as that user
+                        if (user) {
+                            updatePassword(user, newPassword)
+                                .then(() => {
+                                    document.getElementById('change-error-message').innerText = 'Password changed successfully!';
+                                    document.getElementById('change-email').value = '';
+                                    document.getElementById('new-password').value = '';
+                                })
+                                .catch((error) => {
+                                    document.getElementById('change-error-message').innerText = error.message;
+                                });
+                        } else {
+                            document.getElementById('change-error-message').innerText = 'Admin must be logged in as the user to change the password.';
+                        }
+                    }
+                });
+
+                if (!userFound) {
+                    document.getElementById('change-error-message').innerText = 'User not found.';
+                }
+            });
         });
 
         // Delete User
@@ -246,14 +313,12 @@
                     const user = userCredential.user;
                     const userId = user.uid;
 
-                    // Delete user from the database
                     return deleteUser(user).then(() => {
-                        return set(ref(db, 'users/' + userId), null); // Remove user data from database
+                        return set(ref(db, 'users/' + userId), null);
                     });
                 })
                 .then(() => {
                     document.getElementById('delete-error-message').innerText = 'User deleted successfully!';
-                    // Clear fields
                     document.getElementById('delete-email').value = '';
                     document.getElementById('delete-password').value = '';
                 })
@@ -262,10 +327,40 @@
                 });
         });
 
+        // Manage Admin Role
+        document.getElementById('admin-role-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const uid = document.getElementById('role-uid').value;
+
+            // Assign Admin Role
+            document.getElementById('assign-admin-btn').addEventListener('click', () => {
+                set(ref(db, 'users/' + uid + '/role'), 'admin')
+                    .then(() => {
+                        document.getElementById('role-success-message').innerText = 'Admin role assigned successfully!';
+                        document.getElementById('role-uid').value = '';
+                    })
+                    .catch((error) => {
+                        document.getElementById('role-error-message').innerText = error.message;
+                    });
+            });
+
+            // Remove Admin Role
+            document.getElementById('remove-admin-btn').addEventListener('click', () => {
+                set(ref(db, 'users/' + uid + '/role'), null)
+                    .then(() => {
+                        document.getElementById('role-success-message').innerText = 'Admin role removed successfully!';
+                        document.getElementById('role-uid').value = '';
+                    })
+                    .catch((error) => {
+                        document.getElementById('role-error-message').innerText = error.message;
+                    });
+            });
+        });
+
         // Logout
         document.getElementById('logout-btn').addEventListener('click', () => {
             signOut(auth).then(() => {
-                window.location.href = "https://test.mustafapro.com/login.html"; // Redirect to login page on logout
+                window.location.href = "https://test.mustafapro.com/login.html";
             }).catch((error) => {
                 console.error("Error during logout:", error);
             });
