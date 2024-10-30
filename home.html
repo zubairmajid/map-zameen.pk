@@ -8,6 +8,55 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
     <title>Digital Mapping</title>
 </head>
+<!-- Firebase SDKs -->
+<script type="module">
+    // Firebase imports and initialization
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+  
+    const firebaseConfig = {
+apiKey: "AIzaSyDpE3P5p8qmjqrCpWkCO_GByLLGN6T0d8Q",
+authDomain: "digimap-6e7b3.firebaseapp.com",
+databaseURL: "https://digimap-6e7b3-default-rtdb.firebaseio.com",
+projectId: "digimap-6e7b3",
+storageBucket: "digimap-6e7b3.appspot.com",
+messagingSenderId: "822609711769",
+appId: "1:822609711769:web:a7f3ecd060611d9e771e08",
+measurementId: "G-9XC69NPN35"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+  
+    // Check for session token on page load
+    const sessionToken = sessionStorage.getItem("sessionToken");
+if (!sessionToken) {
+window.location.href = "login.html"; // Redirect to login if no token
+} else {
+onAuthStateChanged(auth, (user) => {
+    if (user && user.uid === sessionToken) {
+        // User is authenticated, proceed with your page logic here
+    } else {
+        window.location.href = "login.html"; // Redirect if not authenticated
+    }
+});
+}
+
+  
+    // Clear session token on new tab open
+    window.addEventListener("storage", (event) => {
+      if (event.key === "sessionToken") {
+        sessionStorage.removeItem("sessionToken");
+      }
+    });
+  
+    window.addEventListener("beforeunload", () => {
+      sessionStorage.removeItem("sessionToken"); // Optional: remove token on unload
+    });
+  </script>
+
 <body>
     <body oncontextmenu="return false;">
 
