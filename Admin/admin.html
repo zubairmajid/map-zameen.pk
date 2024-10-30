@@ -100,164 +100,51 @@
     </div>
 
     <script type="module">
+        // Firebase imports and initialization
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, deleteUser, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
-        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+      
         const firebaseConfig = {
-            apiKey: "AIzaSyDpE3P5p8qmjqrCpWkCO_GByLLGN6T0d8Q",
-            authDomain: "digimap-6e7b3.firebaseapp.com",
-            databaseURL: "https://digimap-6e7b3-default-rtdb.firebaseio.com",
-            projectId: "digimap-6e7b3",
-            storageBucket: "digimap-6e7b3.appspot.com",
-            messagingSenderId: "822609711769",
-            appId: "1:822609711769:web:a7f3ecd060611d9e771e08",
-            measurementId: "G-9XC69NPN35"
-        };
+    apiKey: "AIzaSyDpE3P5p8qmjqrCpWkCO_GByLLGN6T0d8Q",
+    authDomain: "digimap-6e7b3.firebaseapp.com",
+    databaseURL: "https://digimap-6e7b3-default-rtdb.firebaseio.com",
+    projectId: "digimap-6e7b3",
+    storageBucket: "digimap-6e7b3.appspot.com",
+    messagingSenderId: "822609711769",
+    appId: "1:822609711769:web:a7f3ecd060611d9e771e08",
+    measurementId: "G-9XC69NPN35"
+};
 
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-        // Check authentication status and redirect if not authenticated
-        onAuthStateChanged(auth, (user) => {
-    if (!user) {
-        window.location.href = "https://test.mustafapro.com/login.html"; // Redirect to login page if not authenticated
-    }
-});
-
-
-        // Navigation Handlers
-        document.getElementById('add-user-btn').addEventListener('click', () => {
-            showContent('add-user-content');
-        });
-        document.getElementById('assign-html-btn').addEventListener('click', () => {
-            showContent('assign-html-content');
-        });
-        document.getElementById('delete-user-btn').addEventListener('click', () => {
-            showContent('delete-user-content');
-        });
-        document.getElementById('view-users-btn').addEventListener('click', () => {
-            showContent('view-users-content');
-            fetchUsers();
-        });
-        document.getElementById('new-users-btn').addEventListener('click', () => {
-            showContent('new-users-content');
-            fetchNewUsers();
-        });
-
-        function showContent(contentId) {
-            const contents = document.querySelectorAll('.content');
-            contents.forEach(content => content.style.display = 'none');
-            document.getElementById(contentId).style.display = 'block';
-            document.getElementById('welcome-message').style.display = 'none'; // Hide welcome message when navigating
+      
+        // Check for session token on page load
+        const sessionToken = sessionStorage.getItem("sessionToken");
+if (!sessionToken) {
+    window.location.href = "login.html"; // Redirect to login if no token
+} else {
+    onAuthStateChanged(auth, (user) => {
+        if (user && user.uid === sessionToken) {
+            // User is authenticated, proceed with your page logic here
+        } else {
+            window.location.href = "login.html"; // Redirect if not authenticated
         }
+    });
+}
 
-        // Fetch Users
-        function fetchUsers() {
-            const usersRef = ref(db, 'users/');
-            const tbody = document.getElementById('users-tbody');
-            tbody.innerHTML = '';
-            let listNo = 1;
-
-            onValue(usersRef, (snapshot) => {
-                snapshot.forEach((childSnapshot) => {
-                    const childKey = childSnapshot.key;
-                    const childData = childSnapshot.val();
-                    const row = document.createElement('tr');
-                    row.innerHTML = `<td>${listNo++}</td><td>${childKey}</td><td>${childData.assignedFile || 'Not Assigned'}</td>`;
-                    tbody.appendChild(row);
-                });
-            });
-        }
-
-        // Fetch New Users
-        function fetchNewUsers() {
-            const usersRef = ref(db, 'users/');
-            const tbody = document.getElementById('new-users-tbody');
-            tbody.innerHTML = '';
-            let serialNo = 1;
-
-            onValue(usersRef, (snapshot) => {
-                snapshot.forEach((childSnapshot) => {
-                    const userData = childSnapshot.val();
-                    const userEmail = userData.email || 'N/A'; // Use email field
-                    const dateCreated = userData.creationTime || 'N/A';
-                    const uid = childSnapshot.key;
-
-                    const row = document.createElement('tr');
-                    row.innerHTML = `<td>${serialNo++}</td><td>${userEmail}</td><td>${uid}</td><td>${dateCreated}</td>`;
-                    tbody.appendChild(row);
-                });
-            });
-        }
-
-        // Sign Up User
-        document.getElementById('signup-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    // Save user data in the database
-                    set(ref(db, 'users/' + user.uid), {
-                        email: email,
-                        assignedFile: null,
-                        creationTime: new Date().toISOString()
-                    });
-                    document.getElementById('error-message').innerText = 'User added successfully!';
-                })
-                .catch((error) => {
-                    document.getElementById('error-message').innerText = error.message;
-                });
+      
+        // Clear session token on new tab open
+        window.addEventListener("storage", (event) => {
+          if (event.key === "sessionToken") {
+            sessionStorage.removeItem("sessionToken");
+          }
         });
-
-        // Assign HTML to User
-        document.getElementById('assign-html-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const uid = document.getElementById('assign-uid').value;
-            const htmlLink = document.getElementById('html-link').value;
-
-            set(ref(db, 'users/' + uid + '/assignedFile'), htmlLink)
-                .then(() => {
-                    document.getElementById('assign-error-message').innerText = 'HTML file assigned successfully!';
-                })
-                .catch((error) => {
-                    document.getElementById('assign-error-message').innerText = error.message;
-                });
+      
+        window.addEventListener("beforeunload", () => {
+          sessionStorage.removeItem("sessionToken"); // Optional: remove token on unload
         });
-
-        // Delete User
-        document.getElementById('delete-user-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('delete-email').value;
-            const password = document.getElementById('delete-password').value;
-
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    return deleteUser(user);
-                })
-                .then(() => {
-                    document.getElementById('delete-error-message').innerText = 'User deleted successfully!';
-                })
-                .catch((error) => {
-                    document.getElementById('delete-error-message').innerText = error.message;
-                });
-        });
-
-        // Logout
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            signOut(auth).then(() => {
-                window.location.href = "https://test.mustafapro.com/login.html"; // Redirect to login page on logout
-            }).catch((error) => {
-                console.error("Error during logout:", error);
-            });
-        });
-    </script>
+      </script>
 </body>
 </html>
