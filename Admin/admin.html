@@ -278,29 +278,35 @@
         });
 
         // Delete User
-        document.getElementById('delete-user-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('delete-email').value;
-            const password = document.getElementById('delete-password').value;
+document.getElementById('delete-user-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('delete-email').value;
+    const password = document.getElementById('delete-password').value;
 
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    const userId = user.uid;
+    // Authenticate the admin user to delete
+    signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            const userId = user.uid;
 
-                    return deleteUser(user).then(() => {
-                        return set(ref(db, 'users/' + userId), null);
-                    });
-                })
-                .then(() => {
-                    document.getElementById('delete-error-message').innerText = 'User deleted successfully!';
-                    document.getElementById('delete-email').value = '';
-                    document.getElementById('delete-password').value = '';
-                })
-                .catch((error) => {
-                    document.getElementById('delete-error-message').innerText = error.message;
-                });
+            // Delete user from Firebase Auth
+            return deleteUser(user).then(() => {
+                // Delete user data from Realtime Database
+                return set(ref(db, 'users/' + userId), null);
+            });
+        })
+        .then(() => {
+            // Show success message
+            document.getElementById('delete-error-message').innerText = 'User and their data deleted successfully!';
+            // Clear input fields
+            document.getElementById('delete-email').value = '';
+            document.getElementById('delete-password').value = '';
+        })
+        .catch((error) => {
+            document.getElementById('delete-error-message').innerText = error.message;
         });
+});
+
 
         // Manage User Roles
         document.getElementById('assign-admin-btn').addEventListener('click', () => {
