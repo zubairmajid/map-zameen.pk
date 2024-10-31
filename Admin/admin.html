@@ -297,21 +297,14 @@
                 }
             });
         });
-         // Update the recordLoginTimestamp function to include email
-function recordLoginTimestamp(uid, email) {
-    const timestampRef = ref(db, 'loginTimestamps/' + uid);
-    set(timestampRef, {
-        email: email,
-        timestamp: Date.now()
-    });
-}
+ 
         document.getElementById('login-timestamps-btn').addEventListener('click', () => {
     showContent('login-timestamps-content');
     fetchLoginTimestamps(); // Fetch login timestamps when this content is shown
 });
 
         // Updated fetchLoginTimestamps function
-function fetchLoginTimestamps(filterDate = null) {
+        function fetchLoginTimestamps(filterDate = null) {
     const timestampsRef = ref(db, 'loginTimestamps/');
     const tbody = document.getElementById('login-timestamps-tbody');
     tbody.innerHTML = '';
@@ -322,12 +315,11 @@ function fetchLoginTimestamps(filterDate = null) {
             snapshot.forEach((childSnapshot) => {
                 const loginData = childSnapshot.val();
                 const uid = childSnapshot.key;
-                const email = loginData.email; // Get email from the data
+                const email = loginData.email;
                 const loginDate = new Date(loginData.timestamp);
                 const formattedDate = loginDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
                 const formattedTime = loginDate.toLocaleTimeString('en-GB', { hour: 'numeric', minute: 'numeric', hour12: true });
 
-                // Filter by date if provided
                 const loginDateString = loginDate.toISOString().split('T')[0];
                 if (!filterDate || filterDate === loginDateString) {
                     const row = document.createElement('tr');
@@ -343,11 +335,11 @@ function fetchLoginTimestamps(filterDate = null) {
     });
 }
 
-// Add an event listener to the filter button
 document.getElementById('filter-timestamps-btn').addEventListener('click', () => {
     const filterDate = document.getElementById('filter-date').value;
     fetchLoginTimestamps(filterDate);
 });
+
 
         // Delete User
         document.getElementById('delete-user-form').addEventListener('submit', (e) => {
