@@ -155,7 +155,7 @@
 
             // Save the timestamp to the database
             const loginTime = formatTimestamp(new Date());
-            await set(ref(database, `users/${uid}/loginTimestamp`), loginTime);
+            await set(ref(database, `users/${uid}/loginTimestamps`), loginTime);
 
             // Set token to expire after 30 minutes
             setTimeout(() => {
