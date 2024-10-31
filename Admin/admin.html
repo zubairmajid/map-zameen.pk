@@ -23,7 +23,7 @@
         <button id="delete-user-btn"><i class="fas fa-user-minus"></i> Delete User</button>
         <button id="manage-role-btn"><i class="fas fa-user-shield"></i> Manage Roles</button>
         <button id="new-users-btn"><i class="fas fa-users"></i> New Users</button>
-
+        <button id="login-timestamps-btn"><i class="fas fa-clock"></i> Login Timestamps</button>
         <h3>HTML Section</h3>
         <button id="assign-html-btn"><i class="fas fa-file-code"></i> Assign HTML</button>
         <button id="update-html-btn"><i class="fas fa-file-upload"></i> Update HTML</button>
@@ -123,6 +123,25 @@
             </tbody>
         </table>
     </div>
+     <!-- Login Timestamps Content -->
+<div class="content" id="login-timestamps-content" style="display: none;">
+    <h1>Login Timestamps</h1>
+    <input type="date" id="filter-date" placeholder="Filter by Date" style="margin-bottom: 10px;">
+<button id="filter-timestamps-btn">Filter</button>
+    <table id="login-timestamps-table">
+        <thead>
+            <tr>
+                <th>Serial No</th>
+                <th>Email</th>
+                <th>Login Date</th>
+                <th>Login Time</th>
+            </tr>
+        </thead>
+        <tbody id="login-timestamps-tbody">
+            <!-- Login timestamps will be populated here -->
+        </tbody>
+    </table>
+</div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
@@ -145,13 +164,15 @@
         const analytics = getAnalytics(app);
         const auth = getAuth(app);
         const db = getDatabase(app);
-
+        
         // Check authentication status
         onAuthStateChanged(auth, (user) => {
             if (!user) {
                 window.location.href = "https://test.mustafapro.com/login.html"; // Redirect to login page if not authenticated
             }
         });
+        
+        
 
         // Navigation Handlers
         document.getElementById('add-user-btn').addEventListener('click', () => {
@@ -276,6 +297,57 @@
                 }
             });
         });
+         // Update the recordLoginTimestamp function to include email
+function recordLoginTimestamp(uid, email) {
+    const timestampRef = ref(db, 'loginTimestamps/' + uid);
+    set(timestampRef, {
+        email: email,
+        timestamp: Date.now()
+    });
+}
+        document.getElementById('login-timestamps-btn').addEventListener('click', () => {
+    showContent('login-timestamps-content');
+    fetchLoginTimestamps(); // Fetch login timestamps when this content is shown
+});
+
+        // Updated fetchLoginTimestamps function
+function fetchLoginTimestamps(filterDate = null) {
+    const timestampsRef = ref(db, 'loginTimestamps/');
+    const tbody = document.getElementById('login-timestamps-tbody');
+    tbody.innerHTML = '';
+    let serialNo = 1;
+
+    onValue(timestampsRef, (snapshot) => {
+        if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+                const loginData = childSnapshot.val();
+                const uid = childSnapshot.key;
+                const email = loginData.email; // Get email from the data
+                const loginDate = new Date(loginData.timestamp);
+                const formattedDate = loginDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+                const formattedTime = loginDate.toLocaleTimeString('en-GB', { hour: 'numeric', minute: 'numeric', hour12: true });
+
+                // Filter by date if provided
+                const loginDateString = loginDate.toISOString().split('T')[0];
+                if (!filterDate || filterDate === loginDateString) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${serialNo++}</td><td>${email}</td><td>${formattedDate}</td><td>${formattedTime}</td>`;
+                    tbody.appendChild(row);
+                }
+            });
+        } else {
+            console.log("No login timestamps available");
+        }
+    }, (error) => {
+        console.error("Error fetching login timestamps:", error);
+    });
+}
+
+// Add an event listener to the filter button
+document.getElementById('filter-timestamps-btn').addEventListener('click', () => {
+    const filterDate = document.getElementById('filter-date').value;
+    fetchLoginTimestamps(filterDate);
+});
 
         // Delete User
         document.getElementById('delete-user-form').addEventListener('submit', (e) => {
