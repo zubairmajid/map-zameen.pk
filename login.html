@@ -107,7 +107,7 @@
   // Firebase imports and initialization
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-  import { getDatabase, ref, child, get } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+  import { getDatabase, ref, child, get, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDpE3P5p8qmjqrCpWkCO_GByLLGN6T0d8Q",
@@ -118,15 +118,19 @@
     messagingSenderId: "822609711769",
     appId: "1:822609711769:web:a7f3ecd060611d9e771e08",
     measurementId: "G-9XC69NPN35"
-};
+  };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const database = getDatabase(app);
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const database = getDatabase(app);
 
+  function formatTimestamp(date) {
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
+    return date.toLocaleString('en-US', options);
+  }
 
-async function login() {
+  async function login() {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
     const errorMessageElement = document.getElementById("error-message");
@@ -141,12 +145,17 @@ async function login() {
         const user = userCredential.user;
         const uid = user.uid;
 
+        // Get the assigned file
         const dbRef = ref(database);
         const snapshot = await get(child(dbRef, `users/${uid}/assignedFile`));
 
         if (snapshot.exists()) {
             const assignedFileURL = snapshot.val();
             sessionStorage.setItem("sessionToken", uid); // Set session token
+
+            // Save the timestamp to the database
+            const loginTime = formatTimestamp(new Date());
+            await set(ref(database, `users/${uid}/loginTimestamp`), loginTime);
 
             // Set token to expire after 30 minutes
             setTimeout(() => {
@@ -166,6 +175,7 @@ async function login() {
         loginButton.disabled = false;
     }
 }
+
 document.addEventListener("DOMContentLoaded", () => {
     const emailInput = document.getElementById("email");
     const passwordInput = document.getElementById("password");
@@ -183,11 +193,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-
   window.login = login;
 </script>
-
-
 </head>
 <body>
   <div class="background">
