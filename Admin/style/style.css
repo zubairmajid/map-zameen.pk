@@ -26,8 +26,8 @@ body {
 .admin-panel-title {
     font-size: 10px; /* Larger for better visibility */
     font-weight: bold; /* Make text bold */
-    color: #ffffff; /* White text color */
-    background-color: green; /* Admin panel background color */
+    color: black; /* White text color */
+    background-color: white; /* Admin panel background color */
     padding: 10px; /* Increased padding for a bolder appearance */
     border-radius: 10px; /* Slightly more rounded */
     text-align: center; /* Center text */
@@ -38,7 +38,7 @@ body {
 }
 
 .admin-panel-title:hover {
-    background-color: #357ABD; /* Darken background on hover */
+    background-color: #2196F3; /* Darken background on hover */
     transform: translateY(-2px); /* Slight lift effect on hover */
 }
 
@@ -113,7 +113,7 @@ body {
     text-align: left;
     cursor: pointer;
     width: 100%;
-    font-size: 16px; /* Increased font size */
+    font-size: 14px; /* Increased font size */
     transition: background 0.3s, padding-left 0.3s; /* Added transition for padding */
 }
 
@@ -127,6 +127,52 @@ body {
     padding: 20px;
     display: none; /* Initially hide the content */
     background-color: #ecf0f1;
+}
+/* Filter Button Container */
+#filter-timestamps-container {
+    display: flex; /* Use flexbox for alignment */
+    justify-content: center; /* Center the content */
+    margin: 20px 0; /* Margin for spacing */
+}
+
+/* Filter Button Styles */
+#filter-timestamps-btn {
+    background-color: #2196F3; /* Blue color */
+    color: white; /* Text color */
+    border: none; /* Remove border */
+    padding: 8px 15px; /* Smaller padding */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer on hover */
+    font-size: 14px; /* Smaller font size */
+    transition: background-color 0.3s, transform 0.2s; /* Smooth transition */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+#filter-timestamps-btn:hover {
+    background-color: #1976D2; /* Darker blue on hover */
+    transform: translateY(-1px); /* Slight lift effect */
+}
+
+/* Input Field Styles */
+#filter-date {
+    padding: 10px; /* Padding for input */
+    border: 1px solid #ced4da; /* Light border color */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 16px; /* Font size */
+    margin-right: 10px; /* Space between input and button */
+    width: 200px; /* Fixed width */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transition */
+}
+
+#filter-date:focus {
+    border-color: #28a745; /* Green border on focus */
+    outline: none; /* Remove outline */
+    box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); /* Subtle glow effect */
+}
+
+/* Container Styles (optional for better layout) */
+#login-timestamps-content {
+    margin-top: 20px; /* Space above the section */
 }
 
 /* Base form styling */
