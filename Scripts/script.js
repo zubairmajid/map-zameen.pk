@@ -134,74 +134,77 @@ loadTurfJs().then(() => {
     let testGeoJsonLayers = [];
     let blackLineLayers = [];
 
-    // Populate first dropdown
-    chakNames.forEach(function(name) {
-        var option = document.createElement('option');
-        option.value = option.textContent = name;
-        document.getElementById('chak-dropdown').appendChild(option);
-    });
+    // Define the city name (e.g., 'City1' or 'City2')
+// Set this dynamically based on your requirements
 
-    // Keep track of the previous tooltip
-    let previousTooltip = null;
+// Populate the first dropdown
+chakNames.forEach(function(name) {
+    var option = document.createElement('option');
+    option.value = option.textContent = name;
+    document.getElementById('chak-dropdown').appendChild(option);
+});
 
-    // Handle chak dropdown change
-    document.getElementById('chak-dropdown').addEventListener('change', function(e) {
-        var chakName = e.target.value;
-        if (currentLayer) {
-            map.removeLayer(currentLayer);
-        }
-        if (Murabba_Layer) {
-            map.removeLayer(Murabba_Layer);
-        }
-        // Remove all testGeoJson layers from the map
-        testGeoJsonLayers.forEach(layer => map.removeLayer(layer));
-        testGeoJsonLayers = [];
+// Keep track of the previous tooltip
+let previousTooltip = null;
 
-        // Remove all black line layers from the map
-        blackLineLayers.forEach(layer => map.removeLayer(layer));
-        blackLineLayers = [];
+// Handle chak dropdown change
+document.getElementById('chak-dropdown').addEventListener('change', function(e) {
+    var chakName = e.target.value;
+    if (currentLayer) {
+        map.removeLayer(currentLayer);
+    }
+    if (Murabba_Layer) {
+        map.removeLayer(Murabba_Layer);
+    }
+    // Remove all testGeoJson layers from the map
+    testGeoJsonLayers.forEach(layer => map.removeLayer(layer));
+    testGeoJsonLayers = [];
 
-        if (chakName !== "Select Chak") {
-            loadGeoJson("JSON Murabba/" + chakName + '.geojson', function(geojsonData) {
-                currentLayer = L.geoJSON(geojsonData, {
-                    style: function() {
-                        return {
-                            fillColor: "#000000",
-                            fillOpacity: 0,
-                            color: "#ff0c04",
-                            weight: 3
-                        };
-                    },
-                    onEachFeature: function(feature, layer) {
-                        if (feature.properties && feature.properties.Murabba_No) {
-                            layer.bindTooltip(feature.properties.Murabba_No, { permanent: true, direction: 'center', className: 'mustateel' }).openTooltip();
-                        }
+    // Remove all black line layers from the map
+    blackLineLayers.forEach(layer => map.removeLayer(layer));
+    blackLineLayers = [];
+
+    if (chakName !== "Select Chak") {
+        // Load GeoJSON file from the dynamically set path
+        loadGeoJson("JSON Murabba/" + cityName + "/" + chakName + '.geojson', function(geojsonData) {
+            currentLayer = L.geoJSON(geojsonData, {
+                style: function() {
+                    return {
+                        fillColor: "#000000",
+                        fillOpacity: 0,
+                        color: "#ff0c04",
+                        weight: 3
+                    };
+                },
+                onEachFeature: function(feature, layer) {
+                    if (feature.properties && feature.properties.Murabba_No) {
+                        layer.bindTooltip(feature.properties.Murabba_No, { permanent: true, direction: 'center', className: 'mustateel' }).openTooltip();
                     }
-                }).addTo(map);
+                }
+            }).addTo(map);
 
-                let bounds = currentLayer.getBounds();
-                map.setView(bounds.getCenter());
-                map.fitBounds(bounds);
+            let bounds = currentLayer.getBounds();
+            map.setView(bounds.getCenter());
+            map.fitBounds(bounds);
 
-                // Clear and populate second dropdown
-                var Murabba_NoDropdown = document.getElementById('Murabba_No-dropdown');
-                Murabba_NoDropdown.innerHTML = '<option>Select Muraba</option>';
+            // Clear and populate the second dropdown
+            var Murabba_NoDropdown = document.getElementById('Murabba_No-dropdown');
+            Murabba_NoDropdown.innerHTML = '<option>Select Muraba</option>';
 
-                var murabbaNumbers = geojsonData.features.map(function(feature) {
-                    return feature.properties.Murabba_No;
-                });
-
-                murabbaNumbers.sort(murabbaSort);
-
-                murabbaNumbers.forEach(function(number) {
-                    var option = document.createElement('option');
-                    option.value = option.textContent = number;
-                    Murabba_NoDropdown.appendChild(option);
-                });
-
+            var murabbaNumbers = geojsonData.features.map(function(feature) {
+                return feature.properties.Murabba_No;
             });
-        }
-    });
+
+            murabbaNumbers.sort(murabbaSort);
+
+            murabbaNumbers.forEach(function(number) {
+                var option = document.createElement('option');
+                option.value = option.textContent = number;
+                Murabba_NoDropdown.appendChild(option);
+            });
+        });
+    }
+});
 
     document.getElementById('Murabba_No-dropdown').addEventListener('change', function(e) {
         var selectedMurabba_No = e.target.value;
