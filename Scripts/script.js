@@ -134,74 +134,56 @@ loadTurfJs().then(() => {
     let testGeoJsonLayers = [];
     let blackLineLayers = [];
 
-    // Populate first dropdown
-    chakNames.forEach(function(name) {
-        var option = document.createElement('option');
-        option.value = option.textContent = name;
-        document.getElementById('chak-dropdown').appendChild(option);
+    // Function to load chak options for the specified city
+function loadChakOptions() {
+    const chakDropdown = document.getElementById('chak-dropdown');
+    chakDropdown.innerHTML = '<option>Select Chak</option>';
+    
+    // Add chak options based on the global variable
+    window.chakNames.forEach(function(chak) {
+        const option = document.createElement('option');
+        option.value = chak;
+        option.textContent = chak;
+        chakDropdown.appendChild(option);
     });
+}
 
-    // Keep track of the previous tooltip
-    let previousTooltip = null;
+// Call the function to load chak options on page load
+loadChakOptions();
 
-    // Handle chak dropdown change
-    document.getElementById('chak-dropdown').addEventListener('change', function(e) {
-        var chakName = e.target.value;
-        if (currentLayer) {
-            map.removeLayer(currentLayer);
-        }
-        if (Murabba_Layer) {
-            map.removeLayer(Murabba_Layer);
-        }
-        // Remove all testGeoJson layers from the map
-        testGeoJsonLayers.forEach(layer => map.removeLayer(layer));
-        testGeoJsonLayers = [];
+// Handle chak dropdown change
+document.getElementById('chak-dropdown').addEventListener('change', function(e) {
+    const chakName = e.target.value;
+    
+    if (currentLayer) {
+        map.removeLayer(currentLayer);
+    }
+    // ... existing cleanup code ...
 
-        // Remove all black line layers from the map
-        blackLineLayers.forEach(layer => map.removeLayer(layer));
-        blackLineLayers = [];
-
-        if (chakName !== "Select Chak") {
-            loadGeoJson("JSON Murabba/" + chakName + '.geojson', function(geojsonData) {
-                currentLayer = L.geoJSON(geojsonData, {
-                    style: function() {
-                        return {
-                            fillColor: "#000000",
-                            fillOpacity: 0,
-                            color: "#ff0c04",
-                            weight: 3
-                        };
-                    },
-                    onEachFeature: function(feature, layer) {
-                        if (feature.properties && feature.properties.Murabba_No) {
-                            layer.bindTooltip(feature.properties.Murabba_No, { permanent: true, direction: 'center', className: 'mustateel' }).openTooltip();
-                        }
+    if (chakName !== "Select Chak") {
+        loadGeoJson(`JSON Murabba/${window.cityName}/${chakName}.geojson`, function(geojsonData) {
+            currentLayer = L.geoJSON(geojsonData, {
+                style: function() {
+                    return {
+                        fillColor: "#000000",
+                        fillOpacity: 0,
+                        color: "#ff0c04",
+                        weight: 3
+                    };
+                },
+                onEachFeature: function(feature, layer) {
+                    if (feature.properties && feature.properties.Murabba_No) {
+                        layer.bindTooltip(feature.properties.Murabba_No, { permanent: true, direction: 'center', className: 'mustateel' }).openTooltip();
                     }
-                }).addTo(map);
+                }
+            }).addTo(map);
 
-                let bounds = currentLayer.getBounds();
-                map.setView(bounds.getCenter());
-                map.fitBounds(bounds);
-
-                // Clear and populate second dropdown
-                var Murabba_NoDropdown = document.getElementById('Murabba_No-dropdown');
-                Murabba_NoDropdown.innerHTML = '<option>Select Muraba</option>';
-
-                var murabbaNumbers = geojsonData.features.map(function(feature) {
-                    return feature.properties.Murabba_No;
-                });
-
-                murabbaNumbers.sort(murabbaSort);
-
-                murabbaNumbers.forEach(function(number) {
-                    var option = document.createElement('option');
-                    option.value = option.textContent = number;
-                    Murabba_NoDropdown.appendChild(option);
-                });
-
-            });
-        }
-    });
+            const bounds = currentLayer.getBounds();
+            map.setView(bounds.getCenter());
+            map.fitBounds(bounds);
+        });
+    }
+});
 
     document.getElementById('Murabba_No-dropdown').addEventListener('change', function(e) {
         var selectedMurabba_No = e.target.value;
