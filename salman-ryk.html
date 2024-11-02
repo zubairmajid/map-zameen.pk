@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Mapping</title>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        // Firebase imports and initialization
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+      
+        const firebaseConfig = {
+    apiKey: "AIzaSyDpE3P5p8qmjqrCpWkCO_GByLLGN6T0d8Q",
+    authDomain: "digimap-6e7b3.firebaseapp.com",
+    databaseURL: "https://digimap-6e7b3-default-rtdb.firebaseio.com",
+    projectId: "digimap-6e7b3",
+    storageBucket: "digimap-6e7b3.appspot.com",
+    messagingSenderId: "822609711769",
+    appId: "1:822609711769:web:a7f3ecd060611d9e771e08",
+    measurementId: "G-9XC69NPN35"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+      
+        // Check for session token on page load
+        const sessionToken = sessionStorage.getItem("sessionToken");
+if (!sessionToken) {
+    window.location.href = "login.html"; // Redirect to login if no token
+} else {
+    onAuthStateChanged(auth, (user) => {
+        if (user && user.uid === sessionToken) {
+            // User is authenticated, proceed with your page logic here
+        } else {
+            window.location.href = "login.html"; // Redirect if not authenticated
+        }
+    });
+}
+
+      
+        // Clear session token on new tab open
+        window.addEventListener("storage", (event) => {
+          if (event.key === "sessionToken") {
+            sessionStorage.removeItem("sessionToken");
+          }
+        });
+      
+        window.addEventListener("beforeunload", () => {
+          sessionStorage.removeItem("sessionToken"); // Optional: remove token on unload
+        });
+      </script>
+      
+    <!-- CSS for Map and Layouts -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.79.0/dist/L.Control.Locate.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+    <link rel="stylesheet" href="CSS/style.css">
+</head>
+
+<body oncontextmenu="return false;">
+    <!-- Top Panel -->
+    <div id="top-panel">
+        <h3 style="margin: 0">Digital Geo Map</h3>
+        <button id="logout-button" style="float: right; padding: 5px 10px; background-color: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">Logout</button>
+    </div>
+
+    <!-- Side Panels for Dropdowns -->
+    <div id="panel-2">
+        <select id="chak-dropdown">
+            <option>Select Mouza</option>
+        </select>
+        <select id="Murabba_No-dropdown">
+            <option>Select Murabba</option>
+        </select>
+    </div>
+
+    <!-- Footer Panel -->
+    <div id="footer-panel">
+        <h4 style="margin: 0">Contact : Zubair Majid 0307-2753841</h4>
+    </div>
+
+    <!-- Map Section -->
+    <div id="map">
+        <div class="north-arrow" id="northArrow"></div>
+    </div>
+
+    <!-- Leaflet JS Library for Map Functionality -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.79.0/dist/L.Control.Locate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+
+    <!-- Custom Script and Data -->
+    <script>
+        // Define city name and chak names here
+        window.cityName = 'RYK'; // Set your desired city name
+        window.chakNames = ["Bhutta Kot", "Taj Pur Mureed Wala", "Pallu Shah", "51-NP","Bahudi Pur Machian","Muhammad Ali Magsi","Pir Abdul Malik"]; // Set your desired chak names
+    </script>
+    <script src="Scripts/script.js"></script>
+
+    <script>
+        // Logout functionality
+        document.getElementById('logout-button').addEventListener('click', () => {
+            sessionStorage.removeItem("sessionToken"); // Clear session token
+            window.location.href = "login.html"; // Redirect to login
+        });
+    </script>
+</body>
+
+</html>
