@@ -165,12 +165,7 @@
         const auth = getAuth(app);
         const db = getDatabase(app);
         
-        // Check authentication status
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                window.location.href = "https://test.mustafapro.com/login.html"; // Redirect to login page if not authenticated
-            }
-        });
+       
         
         
 
@@ -460,3 +455,4 @@ document.getElementById('filter-timestamps-btn').addEventListener('click', () =>
     </script>
 </body>
 </html>
+
